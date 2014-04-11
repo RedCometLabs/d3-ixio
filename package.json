@@ -1,0 +1,28 @@
+{
+  "name": "d3-challenge",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "csv": "*",
+    "grunt": "^0.4.4",
+    "grunt-contrib-clean": "~0.4.1",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-jshint": "~0.6.0",
+    "grunt-contrib-less": "^0.11.0",
+    "grunt-contrib-uglify": "~0.2.0",
+    "grunt-contrib-watch": "~0.4.4",
+    "grunt-mocha-phantomjs": "~0.3.0",
+    "http-proxy": "^1.1.0",
+    "nano": "^5.7.1",
+    "send": "^0.2.0",
+    "url": "~0.7.9",
+    "urls": "~0.0.3"
+  }
+}
