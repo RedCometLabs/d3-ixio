@@ -16,33 +16,46 @@
 
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-  <title>Project Fauxton</title>
+<title>Project Fauxton</title>
 
-  <!-- Application styles. -->
-  <link rel="stylesheet" href="/assets/css/index.css">
-  <style type="text/css">
-    body {
-    padding-top: 60px;
-    padding-bottom: 40px;
-    }
-  </style>
-  <base href="/"></base>
+<!-- Application styles. -->
+<link rel="stylesheet" href="/assets/css/index.css">
+<style type="text/css">
+body {
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+</style>
+<base href="/"></base>
 </head>
 
 <body id="home">
-  <!-- Main container. -->
-  <div role="main" id="main">
-    <div id="app-container"></div>
-
+<!-- Main container. -->
+<div role="main" id="main">
+  <div id="app-container" class="container-fluid"></div>
+  <div class="row"> 
+    <div class="col-lg-11"> 
+      <div id="grouped-bar"> </div>
+    </div>
   </div>
+  <div class="row"> 
+    <div class="col-lg-6"> 
+      <div id="line-chart-product-join-time"> </div>
+    </div>
+  </div>
+</div>
 
-  <!-- Application source. -->
-  <script src="/assets/js/libs/d3.js"></script>
-  <script src="/app/app.js"></script>
+<!-- Application source. -->
+<script src="/assets/js/libs/d3.js"></script>
+<script src="/assets/js/libs/d3.tip.js"></script>
+<script src="/assets/js/libs/jquery.js"></script>
+<script src="/assets/js/libs/lodash.js"></script>
+<script src="/app/charts.js"></script>
+<script src="/app/main.js"></script>
 </body>
 </html>
 

@@ -25,7 +25,7 @@ module.exports = function (grunt) {
     // Options
     var dist_dir = './',
         app_dir = './',
-        port = 8000;
+        port = options.port || 8001;
 
     // Proxy options with default localhost
     // Proxy options with default localhost
@@ -44,7 +44,7 @@ module.exports = function (grunt) {
     var proxy = new httpProxy.createProxyServer(proxy_settings);
 
     http.createServer(function (req, res) {
-      var url = req.url.replace('app/',''),
+      var url = req.url,
           accept = req.headers.accept.split(','),
           filePath;
 

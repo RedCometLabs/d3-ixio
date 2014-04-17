@@ -45,7 +45,7 @@ module.exports = function (grunt) {
       },
 
       kubu: {
-        src: ['tasks/**/*.js', 'src/**/*.js', 'tests/**/*.js']
+        src: ['tasks/**/*.js', 'app/**/*.js', 'tests/**/*.js']
       }
     },
 
@@ -77,7 +77,7 @@ module.exports = function (grunt) {
      couchserver: {
        defaults: {
           dist: './dist/debug/',
-          port: 8000,
+          port: 8001,
           proxy: {
             target: {
               host: 'localhost',
