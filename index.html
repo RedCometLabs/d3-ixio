@@ -20,9 +20,10 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>Project Fauxton</title>
+<title>IXIO</title>
 
 <!-- Application styles. -->
+<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
 <link rel="stylesheet" href="/assets/css/index.css">
 <style type="text/css">
 body {
@@ -33,18 +34,25 @@ body {
 <base href="/"></base>
 </head>
 
-<body id="home">
+<body>
 <!-- Main container. -->
 <div role="main" id="main">
-  <div id="app-container" class="container-fluid"></div>
-  <div class="row"> 
-    <div class="col-lg-11"> 
-      <div id="grouped-bar"> </div>
-    </div>
-  </div>
-  <div class="row"> 
-    <div class="col-lg-6"> 
-      <div id="line-chart-product-join-time"> </div>
+  <div id="app-container" class="container-fluid">
+    <div class="row"> 
+      <div class="col-lg-12"> 
+        <div id="intro" style="display: none">
+          <div id="intro-text">
+            <h1> Ixio D3 Challenge </h1>
+            <p> The aim of his challenge was to use <strong>d3.js</strong> to
+            display demographic data. The data is broken into "ClusterGroups".
+            Lets begin exploring this data. 
+            <a href="#graph1"> <span class="glyphicon glyphicon-arrow-right"> </span></a>
+            </p>
+          </div>
+          <div id="main-text"> </div>
+          <div id="chart-area"> </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -54,6 +62,7 @@ body {
 <script src="/assets/js/libs/d3.tip.js"></script>
 <script src="/assets/js/libs/jquery.js"></script>
 <script src="/assets/js/libs/lodash.js"></script>
+<script src="/assets/js/libs/backbone.js"></script>
 <script src="/app/charts.js"></script>
 <script src="/app/main.js"></script>
 </body>

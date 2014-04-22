@@ -1,5 +1,13 @@
 @import "bootstrap/bootstrap.less";
 
+body {
+  font-family: 'Oswald', 'sans-serif';
+}
+
+.col-lg-12 {
+  padding-left: 0;
+}
+
 
 #grouped-bar {
   .axis path,
@@ -30,6 +38,16 @@
   border-radius: 2px;
 }
 
+#main {
+  margin: 0;
+  padding: 0;
+  top: 0;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
+
 /* Creates a small triangle extender for the tooltip */
 .d3-tip:after {
   box-sizing: border-box;
@@ -48,4 +66,41 @@
   margin: -1px 0 0 0;
   top: 100%;
   left: 0;
+}
+
+#intro {
+  background-size: 100%;
+  background: #000 url(../img/crowd2.jpg) repeat-y center center;
+
+  #intro-text {
+    display: inline-block;
+    position: absolute;
+    z-index: 10;
+    width: 52%;
+    top: 20px;
+    left: 72px;
+    color: #fff;
+
+    h1 {
+      font-size: 115px;
+    }
+
+    p {
+      font-size: 30px;
+      margin-top: 50px;
+      font-family: verdana;
+    }
+
+  }
+}
+
+#main-text {
+  font-size: 30px;
+  display: inline-block;
+  position: absolute;
+  z-index: 10;
+  width: 52%;
+  top: 20px;
+  left: 72px;
+  color: #fff;
 }
