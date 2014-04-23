@@ -9,23 +9,46 @@ body {
 }
 
 
-#grouped-bar {
-  .axis path,
-  .axis line {
-    fill: none;
-    stroke: #000;
-    shape-rendering: crispEdges;
-  }
+.axis path,
+.axis line {
+  fill: none;
+  shape-rendering: crispEdges;
+}
 
-  .y.axis path {
-    display: none;
-  }
+.y.axis line {
+  stroke: #666;
+  opacity: .5;
+  vector-effect: non-scaling-stroke;
+  stroke-width: 1px;
+}
 
-  .y.axis line {
-    stroke: #777;
-    stroke-dasharray: 2,2;
-  }
 
+.x.axis path {
+  fill: none;
+  shape-rendering: crispEdges;
+  stroke: #666;
+  stroke-width: 1px;
+}
+
+.y.axis .tick,
+.x.axis .tick {
+  font-size: 16px; 
+  stroke: #666;
+  opacity: .5;
+}
+
+.legend-text {
+  //stroke: white;
+}
+
+.line {
+}
+
+.y.axis path {
+  fill: none;
+  stroke-dasharray: 3px, 3px;
+  shape-rendering: crispEdges;
+  stroke: none;
 }
 
 
@@ -102,5 +125,5 @@ body {
   width: 52%;
   top: 20px;
   left: 72px;
-  color: #fff;
+  color: #333;
 }

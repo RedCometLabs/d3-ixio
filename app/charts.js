@@ -17,7 +17,71 @@
 
       this._height = _;
       return this;
-    }
+    },
+
+    yScale: function(_) {
+      if (arguments.length === 0) {
+        return this._yScale;
+      }
+
+      this._yScale = _;
+      return this;
+    },
+
+    xScale: function(_) {
+      if (arguments.length === 0) {
+        return this._xScale;
+      }
+
+      this._xScale = _;
+      return this;
+    },
+
+    yAxis: function(_) {
+      if (arguments.length === 0) {
+        return this._yAxis;
+      }
+
+      this._yAxis = _;
+      return this;
+    },
+
+    xAxis: function(_) {
+      if (arguments.length === 0) {
+        return this._xAxis;
+      }
+
+      this._xAxis = _;
+      return this;
+    },
+
+    margin: function(_) {
+      if (arguments.length === 0) {
+        return this._margin;
+      }
+
+      this._margin = _;
+      return this;
+    },
+
+    yTitle: function(_) {
+        if (arguments.length === 0) {
+          return this._yTitle;
+        }
+
+        this._yTitle = _;
+        return this;
+      },
+
+    xTitle:  function(_) {
+        if (arguments.length === 0) {
+          return this._xTitle;
+        }
+
+        this._xTitle = _;
+        return this;
+      }
+
   };
 
   charts.Line = function () {
@@ -132,9 +196,7 @@
 
     },
 
-    chart.realtimeData = [];
     _.extend(chart, chartMixins);
-
 
     return chart;
   };
@@ -216,18 +278,13 @@ value: 3938
 
   };*/
 
-  charts.GroupedBarChart = {
-
-    initialise: function (options) {
-      var margin = this.margin = options.margin;
-
+  charts.GroupedBarChart = function () {
       var x0 = d3.scale.ordinal();
       var x1 = d3.scale.ordinal();
-      var y = d3.scale.linear();
 
       var color = d3.scale.category20c();
 
-      var xAxis = d3.svg.axis()
+      /*var xAxis = d3.svg.axis()
         .scale(x0)
         .orient("bottom");
 
@@ -235,27 +292,39 @@ value: 3938
         .scale(y)
         .orient("left")
         .tickFormat(d3.format(".2s"));
+       */
 
-      var div = d3.select("body").append("div")   
-      .attr("class", "tooltip")               
-      .style("opacity", 0);
-
+      
       function chart(selection) {
+          var yAxis = chart.yAxis(),
+              xAxis = chart.xAxis(),
+              yScale = chart.yScale(),
+              margin = chart.margin();
+
+        xAxis.scale(x0).orient("bottom");
+
+        yAxis
+          .scale(yScale)
+          .orient("left")
+          .tickFormat(d3.format(".2s"));
+
         selection.each(function (data) {
-          var width = chart.width() - margin.left - margin.right,
-          height = chart.height() - margin.top - margin.bottom;
+          var width = chart.width(), // - margin.left - margin.right,
+              height = chart.height() - margin.top - margin.bottom;
 
           yAxis.tickSize(-width);
+          console.log(margin, width, height);
 
           var clusterNames = ["1", "2", "3", "4", "5", "6", "7"],
-          incomeNames = ["unknown", "a", "b", "c", "d", "e", "f", "g", "h", "i"];
+              incomeNames = ["unknown", "a", "b", "c", "d", "e", "f", "g", "h", "i"];
 
           x0.rangeRoundBands([0, width], 0.4)
-          .domain(incomeNames);
+            .domain(incomeNames);
 
           x1.domain(clusterNames).rangeRoundBands([0, x0.rangeBand()]);
-          y.range([height, 0])
-          .domain([0, 100]);
+
+          yScale.range([height, 0])
+            .domain([0, 100]);
 
           var tip = d3.tip()
           .attr('class', 'd3-tip')
@@ -264,31 +333,26 @@ value: 3938
             return "<strong>Group "+ d.name + ":</strong> <span style=' color:"+ color(d.name) +"'>" + parseInt(d.value, 10) + "%</span>";
           });
 
-          var svg = d3.select(this).append("svg")
-          .attr("width", chart.width())
-          .attr("height", chart.height())
-          .append("g")
-          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+          var svg = d3.select(this); 
 
           svg.call(tip);
 
-          svg.append("g")
-          .attr("class", "x axis")
-          .attr("transform", "translate(0," + height + ")")
-          .call(xAxis);
+          console.log('svg', svg);
+          svg.select('.x.axis')
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
 
-          svg.append("g")
-          .attr("class", "y axis")
-          .call(yAxis)
-          .append("text")
-          .attr("transform", "rotate(-90)")
-          .attr("y", 6)
-          .attr("dy", ".71em")
-          .style("text-anchor", "end")
-          .text(chart.yTitle());
+          svg.select('.y.axis')
+            .call(yAxis)
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text(chart.yTitle());
 
           var income = svg.selectAll(".income")
-          .data(data, function (d) { return d.name; });
+              .data(data, function (d) { return d.name; });
 
           income
           .enter().append("g")
@@ -301,24 +365,24 @@ value: 3938
           .data(function(d) { return d.points; }, function (d) { return d.name;});
 
           incomeBars
-          .enter()
-          .append("rect")
-          .attr("class", "group-bar")
-          .attr("width", x1.rangeBand())
-          .attr("x", function(d) { return x1(d.name); })
-          .attr("y", function(d) { return y(0); })
-          .attr("height", function(d) { return height - y(0); })
-          .style("fill", function(d) { return color(d.name); })
-          .on('mouseover', tip.show)
-          .on('mouseout', tip.hide)
-          .transition()
-          .duration(1000)
-          .attr("y", function(d) { return y(d.value); })
-          .attr("height", function(d) { return height - y(d.value); });
+            .enter()
+            .append("rect")
+              .attr("class", "group-bar")
+              .attr("width", x1.rangeBand())
+              .attr("x", function(d) { return x1(d.name); })
+              .attr("y", function(d) { return yScale(0); })
+              .attr("height", function(d) { return height - yScale(0); })
+              .style("fill", function(d) { return color(d.name); })
+              .on('mouseover', tip.show)
+              .on('mouseout', tip.hide)
+              .transition()
+              .duration(1000)
+              .attr("y", function(d) { return yScale(d.value); })
+              .attr("height", function(d) { return height - yScale(d.value); });
 
           incomeBars
-          .exit()
-          .remove();
+            .exit()
+            .remove();
 
           var legend = svg.selectAll(".legend")
           .data(clusterNames.reverse())
@@ -327,19 +391,32 @@ value: 3938
           .attr("transform", function(d, i) { return "translate(30," + i * 20 + ")"; });
 
           legend.append("rect")
-          .attr("x", width - 48)
+          .attr("x", width - 58)
           .attr("width", 18)
           .attr("height", 18)
           .style("fill", color);
 
           legend.append("text")
-          .attr("x", width + 30)
+          .attr("x", width + 20)
           .attr("y", 9)
           .attr("dy", ".35em")
           .style("text-anchor", "end")
           .text(function(d) { return "Group: " +d; });
+        });
+          
+      }
 
-          window.setTimeout(function () {
+      _.extend(chart, chartMixins);
+
+      
+      return chart;
+  };
+
+})(window, window.$, window.d3, window._);
+
+
+/*
+ window.setTimeout(function () {
             var newData = _.map(data, function (d) {
               var points = _.filter(d.points, function(p) {
                 if (p.name === "6") {
@@ -373,32 +450,5 @@ value: 3938
           }, 5000);
 
         });
-
-      }
-
-      _.extend(chart, chartMixins);
-
-      chart.yTitle = function(_) {
-        if (arguments.length === 0) {
-          return this._yTitle;
-        }
-
-        this._yTitle = _;
-        return this;
-      };
-
-      chart.xTitle =  function(_) {
-        if (arguments.length === 0) {
-          return this._xTitle;
-        }
-
-        this._xTitle = _;
-        return this;
-      };
-
-      return chart;
-    }
-
-  };
-
-})(window, window.$, window.d3, window._);
+*
+ */

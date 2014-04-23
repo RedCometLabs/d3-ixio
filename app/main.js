@@ -2,11 +2,7 @@
   console.log('hello');
   var charts = global.charts;
 
-  
-
-
-  var dataStructure = function (rows) {
-    var data = {};
+  var dataStructure = function (data, rows) {
     data.allDocs = _.map(rows, function (row) { return row.doc; });
     data.clusterSizes = _.values(_.reduce(data.allDocs, function (info, doc) {
       var cg = doc.ClusterGroup;
@@ -99,17 +95,22 @@
             }
     }));
     console.log('inclie', data.IncomeCluster);
-
     return data;
   };
 
   var app = {
-    initialize: function () {
+    initialize: function (data) {
+      this.margin = {
+        left: 30,
+        right: 0,
+        top: 20,
+        bottom: 30
+      };
+
       this.el = "#chart-area";
       this.$el = $(this.el);
+      this.data = data;
 
-      this.router = new AppRouter();
-      Backbone.history.start();
       this.xScale = d3.scale.linear().range([0, this.width()]);
       this.yScale = d3.scale.linear().range([this.height(), 0]);
 
@@ -121,11 +122,45 @@
           .scale(this.yScale)
           .orient("left");
 
-      /*this.svg = d3.select(this.el)
+      this.svg = d3.select(this.el)
                   .append("svg")
                   .append("g")
+                  .attr('class', 'svg-chart-area')
                   .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
-                 */
+
+
+      this.svg.append("g")
+        .attr("class", "x axis");
+        //.attr("transform", "translate(0," + this.height() + ")")
+        //.call(this.xAxis);
+
+      this.svg.append("g")
+        .attr("class", "y axis");
+        //.call(this.yAxis);
+
+      var div = d3.select("body").append("div")   
+      .attr("class", "tooltip")               
+      .style("opacity", 0);
+
+    },
+
+    showIncomeClusterGroups: function () {
+      var groupedBarChart = charts.GroupedBarChart()
+                              .yScale(this.yScale)
+                              .xScale(this.xScale)
+                              .yAxis(this.yAxis)
+                              .xAxis(this.xAxis)
+                              .margin(this.margin)
+                              .width(this.windowWidth() - 100)
+                              .height(this.windowHeight())
+                              .yTitle('Percentage')
+                              .xTitle('Income Group');
+
+      d3.select(".svg-chart-area")
+        .datum(data.IncomeCluster)
+        .call(groupedBarChart);
+
+      this.setText('Hello, this is a long story of text that I am now writing', true);
     },
 
     margin: {
@@ -150,9 +185,9 @@
      };
 
      if (fadeIn) {
-       $text.hide('slow', function () {
+       $text.hide('fast', function () {
          fn();
-         $text.show('slow');
+         $text.show('fast');
        });
        return;
      }
@@ -160,24 +195,39 @@
      fn();
    },
 
+   windowHeight: function () {
+     return $(window).height();
+   },
+
+   windowWidth: function () {
+     return $(window).width();
+   },
+
    displayIntro: function () {
      $('#intro')
-      .width($(window).width())
-      .height($(window).height())
+      .width(this.windowWidth())
+      .height(this.windowHeight())
       .show();
+   },
+
+   hideIntro: function () {
+     $('#intro').hide();
    }
 
   };
 
+  var data = {}, router;
+
   var AppRouter = Backbone.Router.extend({
 
       routes: {
-        "graph1":                 "help",    // #help
+        "graph1":                 "graph1",    // #help
         "(/)": "start"   
       },
 
-      help: function() {
-        window.alert('boo');
+      graph1: function() {
+        app.hideIntro();
+        app.showIncomeClusterGroups(data.IncomeCluster);
       },
 
       start: function(query, page) {
@@ -190,8 +240,11 @@
   $(function () {
     var promise = $.getJSON('/ixio-challenge/_all_docs?include_docs=true&limit=5000');
     promise.then(function (resp) {
-      var data = dataStructure(resp.rows);
-      app.initialize();
+      dataStructure(data, resp.rows);
+      console.log('data', data);
+      app.initialize(data);
+      router = new AppRouter();
+      Backbone.history.start();
       /*var lineChart = charts.Line()
         .width($("#line-chart-product-join-time").width())
         .height(100);
@@ -202,7 +255,6 @@
 
       //var bubbleChart = charts.Bubble().diameter($("#bubble").width());
       //d3.select("#bubble").datum(data.clusterSizes).call(bubbleChart);
-      console.log('d', data);
       //var groupedBarChart = charts.GroupedBarChart().width($("#grouped-bar").width()).height(500).yTitle('Percentage').xTitle('Income Group');
       //d3.select("#grouped-bar").datum(data.IncomeCluster).call(groupedBarChart);
 
