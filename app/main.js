@@ -150,18 +150,137 @@
                               .xScale(this.xScale)
                               .yAxis(this.yAxis)
                               .xAxis(this.xAxis)
+                              .xColumns(["1", "2", "3", "4", "5", "6", "7"])
+                              .xGroups(["unknown", "a", "b", "c", "d", "e", "f", "g", "h", "i"])
                               .margin(this.margin)
                               .width(this.windowWidth() - 100)
                               .height(this.windowHeight())
                               .yTitle('Percentage')
                               .xTitle('Income Group');
 
+      var barData = _.map(data.clusterSizes, function (ic) {
+          var incomes = _.map(ic.income, function (val, key) {
+            return {
+              name: key,
+              value: parseInt((val / ic.size) * 100, 10)
+            };
+          });
+
+          return {
+            name: ic.clusterGroup,
+            points: incomes
+          };
+      });
+
+      console.log(barData);
+
       d3.select(".svg-chart-area")
-        .datum(data.IncomeCluster)
+        .datum(barData)
         .call(groupedBarChart);
 
-      this.setText('Hello, this is a long story of text that I am now writing', true);
+      this.setText('Hello, this is a long story of text that I am now writing', '#graph2', true);
     },
+
+    showGender: function () {
+      var groupedBarChart = charts.StackedBar()
+                              .yScale(this.yScale)
+                              .xScale(this.xScale)
+                              .yAxis(this.yAxis)
+                              .xAxis(this.xAxis)
+                              .margin(this.margin)
+                              .width(this.windowWidth() - 100)
+                              .height(this.windowHeight())
+                              .xColumns(["1", "2", "3", "4", "5", "6", "7"])
+                              .xGroups(["Male", "Female"])
+                              .yTitle('Percentage')
+                              .xTitle('Cluster Groups');
+
+      /*var barData = _.values(_.reduce(data.clusterSizes, function (sum, ic) {
+        sum["females"].push(
+          {
+            x: ic.clusterGroup,
+            name: "Female",
+            y: parseInt((ic.female / ic.size) * 100, 10)
+          });
+
+        sum["males"].push({
+            x: ic.clusterGroup,
+            name: "Male",
+            y: parseInt((ic.male / ic.size) * 100, 10)
+          });
+
+        return sum;
+      }, {"females":[], "males":[]}));*/
+
+      var barData = _.map(data.clusterSizes, function (ic) {
+        var y0 = 0;
+          return {
+            name: ic.clusterGroup,
+            points: [
+              {
+                name: "Male",
+                value: parseInt((ic.male / ic.size) * 100, 10),
+                y0: y0,
+                y1: y0 += parseInt((ic.male / ic.size) * 100, 10)
+              },
+              {
+                name: "Female",
+                value: parseInt((ic.female / ic.size) * 100, 10),
+                y0: y0,
+                y1: y0 += parseInt((ic.female / ic.size) * 100, 10)
+              }
+            ]
+          };
+      });
+
+
+      console.log(barData);
+      d3.select(".svg-chart-area")
+        .datum(barData)
+        .call(groupedBarChart);
+
+      this.setText('Hello, this is a long story of text that I am now writing','#graph2', true);
+    },
+
+    showGenderOld: function () {
+      var groupedBarChart = charts.GroupedBarChart()
+                              .yScale(this.yScale)
+                              .xScale(this.xScale)
+                              .yAxis(this.yAxis)
+                              .xAxis(this.xAxis)
+                              .margin(this.margin)
+                              .width(this.windowWidth() - 100)
+                              .height(this.windowHeight())
+                              .xColumns(["1", "2", "3", "4", "5", "6", "7"])
+                              .xGroups(["Male", "Female"])
+                              .yTitle('Percentage')
+                              .xTitle('Cluster Groups');
+
+      var barData = _.map(data.clusterSizes, function (ic) {
+          return {
+            name: ic.clusterGroup,
+            points: [
+              {
+                name: "Female",
+                y0: 0,
+                y1: parseInt((ic.female / ic.size) * 100, 10)
+              },
+              {
+                name: "Male",
+                value: parseInt((ic.male / ic.size) * 100, 10)
+              }
+            ]
+          };
+      });
+
+      console.log(barData);
+      d3.select(".svg-chart-area")
+        .datum(barData)
+        .call(groupedBarChart);
+
+      this.setText('Hello, this is a long story of text that I am now writing','#graph2', true);
+    },
+
 
     margin: {
       top: 0, 
@@ -178,16 +297,19 @@
      return this.$el.height();
    },
   
-   setText: function (text, fadeIn) {
-     var $text = $('#main-text');
+   setText: function (text, link, fadeIn) {
+     var $text = $('#main-text-span'),
+         $textArea = $('#main-text'),
+         $link = $('#text-link');
      var fn = function () {
       $text.text(text);
+      $link.prop('href', link);
      };
 
      if (fadeIn) {
-       $text.hide('fast', function () {
+       $textArea.hide('fast', function () {
          fn();
-         $text.show('fast');
+         $textArea.show('fast');
        });
        return;
      }
@@ -222,11 +344,16 @@
 
       routes: {
         "graph1":                 "graph1",    // #help
+        "graph2":                 "graph2",    // #help
         "(/)": "start"   
       },
 
       graph1: function() {
         app.hideIntro();
+        app.showGender(data.clusterSizes);
+      },
+
+      graph2: function() {
         app.showIncomeClusterGroups(data.IncomeCluster);
       },
 

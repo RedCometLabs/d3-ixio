@@ -80,7 +80,26 @@
 
         this._xTitle = _;
         return this;
-      }
+      },
+
+    xColumns:  function(_) {
+        if (arguments.length === 0) {
+          return this._xColumns;
+        }
+
+      this._xColumns = _;
+      return this;
+   },
+
+    xGroups:  function(_) {
+        if (arguments.length === 0) {
+          return this._xGroups;
+        }
+
+      this._xGroups = _;
+      return this;
+   }
+ 
 
   };
 
@@ -299,7 +318,9 @@ value: 3938
           var yAxis = chart.yAxis(),
               xAxis = chart.xAxis(),
               yScale = chart.yScale(),
-              margin = chart.margin();
+              margin = chart.margin(),
+              xColumns = chart.xColumns(),
+              xGroups = chart.xGroups();
 
         xAxis.scale(x0).orient("bottom");
 
@@ -312,16 +333,16 @@ value: 3938
           var width = chart.width(), // - margin.left - margin.right,
               height = chart.height() - margin.top - margin.bottom;
 
+          color.domain(xGroups);
           yAxis.tickSize(-width);
-          console.log(margin, width, height);
 
-          var clusterNames = ["1", "2", "3", "4", "5", "6", "7"],
-              incomeNames = ["unknown", "a", "b", "c", "d", "e", "f", "g", "h", "i"];
+          //var xGroups = ["1", "2", "3", "4", "5", "6", "7"],
+          //    xColumns = ["unknown", "a", "b", "c", "d", "e", "f", "g", "h", "i"];
 
           x0.rangeRoundBands([0, width], 0.4)
-            .domain(incomeNames);
+            .domain(xColumns);
 
-          x1.domain(clusterNames).rangeRoundBands([0, x0.rangeBand()]);
+          x1.domain(xGroups).rangeRoundBands([0, x0.rangeBand()]);
 
           yScale.range([height, 0])
             .domain([0, 100]);
@@ -330,7 +351,7 @@ value: 3938
           .attr('class', 'd3-tip')
           .offset([-10, 0])
           .html(function(d) {
-            return "<strong>Group "+ d.name + ":</strong> <span style=' color:"+ color(d.name) +"'>" + parseInt(d.value, 10) + "%</span>";
+            return "<strong>"+ d.name + ":</strong> <span style=' color:"+ color(d.name) +"'>" + parseInt(d.value, 10) + "%</span>";
           });
 
           var svg = d3.select(this); 
@@ -369,7 +390,7 @@ value: 3938
             .append("rect")
               .attr("class", "group-bar")
               .attr("width", x1.rangeBand())
-              .attr("x", function(d) { return x1(d.name); })
+              .attr("x", function(d) { console.log('x1', d); return x1(d.name); })
               .attr("y", function(d) { return yScale(0); })
               .attr("height", function(d) { return height - yScale(0); })
               .style("fill", function(d) { return color(d.name); })
@@ -385,7 +406,7 @@ value: 3938
             .remove();
 
           var legend = svg.selectAll(".legend")
-          .data(clusterNames.reverse())
+            .data(xGroups.reverse())
           .enter().append("g")
           .attr("class", "legend")
           .attr("transform", function(d, i) { return "translate(30," + i * 20 + ")"; });
@@ -401,10 +422,16 @@ value: 3938
           .attr("y", 9)
           .attr("dy", ".35em")
           .style("text-anchor", "end")
-          .text(function(d) { return "Group: " +d; });
+          .text(function(d) { return d; });
         });
           
       }
+
+      chart.remove = function () {
+        chart.legend
+          .transition()
+          .duration(500);
+      };
 
       _.extend(chart, chartMixins);
 
@@ -412,43 +439,116 @@ value: 3938
       return chart;
   };
 
+
+charts.StackedBar = function () {
+  var x0 = d3.scale.ordinal();
+  var color = {
+    "Female": "A64260", //d3.scale.category20c();
+    "Male": "225B84"
+  };
+
+  function chart(selection) {
+    var yAxis = chart.yAxis(),
+              xAxis = chart.xAxis(),
+              yScale123 = chart.yScale(),
+              margin = chart.margin(),
+              xColumns = chart.xColumns(),
+              xGroups = chart.xGroups();
+
+        xAxis.scale(x0).orient("bottom");
+
+
+    selection.each(function (data) {
+
+      var width = chart.width(), // - margin.left - margin.right,
+          height = chart.height() - margin.top - margin.bottom,
+          svg = d3.select(this);
+
+      x0.rangeRoundBands([0, width], 0.4);
+
+        // Transpose the data into layers by cause.
+      // [{value: male-x, name: ClusterGroup}, {
+        /*var stackedValues = d3.layout.stack()(xStacks.map(function(cause) {
+          return crimea.map(function(d) {
+            return {x: parse(d.date), y: +d[cause]};
+          });
+        }));*/
+        // Compute the x-domain (by date) and y-domain (by top).
+        //color.domain(xGroups);
+        x0.domain(xColumns);
+        yScale123.range([0, height])
+            .domain([0, 100]);
+
+        var y = d3.scale.linear().rangeRound([height, 0]).domain([0, 100]);
+
+        yAxis
+          .scale(y)
+          .orient("left")
+          .tickFormat(d3.format(".2s"));
+
+        // Add a group for each cause.
+        var cause = svg.selectAll(".cause")
+            .data(data)
+          .enter().append("g")
+            .attr("class", "cause")
+            .attr("transform", function(d) { return "translate(" + x0(d.name) + ",0)"; });
+
+        // Add a rect for each column.
+        var rect = cause.selectAll("rect")
+            .data(function (d) { return d.points;})
+          .enter()
+            .append("rect")
+            //.attr("x", function(d) { return x0(d.x); })
+            .attr("height", function(d) { console.log('d', d); return y(d.y0) - y(d.y1); })
+            .attr("y", function(d) { return y(d.y1); })
+            .style("fill", function(d, i) { console.log(d); return color[d.name]; })
+            .attr("width", x0.rangeBand());
+         
+          cause.selectAll('text')
+            .data(function (d) {return d.points;})
+           .enter()
+            .append("text")
+            .attr('x', x0.rangeBand()/2 - 7)
+            .attr("y", function (d) {return y(d.y1) + 10;})
+            .attr("dy", ".35em")
+            .style("text-anchor", "middle")
+            .text(function(d) { return d.value + "% " + d.name; });
+
+        svg.select('.x.axis')
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+
+          svg.select('.y.axis')
+            .call(yAxis);
+
+
+         var legend = svg.selectAll(".legend")
+            .data(xGroups.reverse())
+          .enter().append("g")
+          .attr("class", "legend")
+          .attr("transform", function(d, i) { return "translate(30," + i * 20 + ")"; });
+
+          legend.append("rect")
+          .attr("x", width - 58)
+          .attr("width", 18)
+          .attr("height", 18)
+          .style("fill", function (d) { return color[d];});
+
+          legend.append("text")
+          .attr("x", width + 20)
+          .attr("y", 9)
+          .attr("dy", ".35em")
+          .style("text-anchor", "end")
+          .text(function(d) { return d; });
+
+     });
+
+  }
+  
+  _.extend(chart, chartMixins);
+
+  return chart;
+
+};
+
 })(window, window.$, window.d3, window._);
-
-
-/*
- window.setTimeout(function () {
-            var newData = _.map(data, function (d) {
-              var points = _.filter(d.points, function(p) {
-                if (p.name === "6") {
-                  return false;
-                }
-
-                return true;
-              });
-
-              return {
-                name: d.name,
-                points: points
-              };
-            });
-
-            console.log('bb', data);
-
-            var bb = svg.selectAll('.income').data(newData);
-
-
-            var aa = bb.selectAll(".group-bar").data(function (d) { return d.points;}, function (d) { return d.name;});
-            aa.exit()
-            .transition()
-            .duration(2000)
-            .attr("y", y(0))
-            .attr('height', height - y(0))
-            .remove();
-            //income.data(data);
-            //incomeBars.data(data);
-
-          }, 5000);
-
-        });
-*
- */
