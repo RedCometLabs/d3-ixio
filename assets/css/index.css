@@ -5801,6 +5801,10 @@ body {
   stroke: #666;
   opacity: .5;
 }
+.line {
+  fill: none;
+  stroke-width: 3px;
+}
 .y.axis path {
   fill: none;
   stroke-dasharray: 3px, 3px;

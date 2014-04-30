@@ -1,5 +1,4 @@
 (function (global,$, d3, _) {
-  console.log('hello');
   var charts = global.charts;
 
   var dataStructure = function (data, rows) {
@@ -25,6 +24,11 @@
             i: 0
           }
         };
+
+        info[cg].joinYear = _.reduce(_.range(1985, 2014), function (group, year) {
+          group[year.toString()] = 0;
+          return group;
+        }, {});
       }
 
       var group = info[cg];
@@ -32,6 +36,7 @@
       group.size = group.size + 1;
       var income = doc.income === "" ? "unknown" : doc.income.toLowerCase() ;
       group.income[income] = group.income[income] + 1;
+      group.joinYear[doc.joinYear] =  group.joinYear[doc.joinYear] + 1;
 
       if (doc.gender === "Female") {
         group.female = group.female + 1;
@@ -94,14 +99,13 @@
               points: []
             }
     }));
-    console.log('inclie', data.IncomeCluster);
     return data;
   };
 
   var app = {
     initialize: function (data) {
       this.margin = {
-        left: 30,
+        left: 50,
         right: 0,
         top: 20,
         bottom: 30
@@ -111,7 +115,7 @@
       this.$el = $(this.el);
       this.data = data;
 
-      this.xScale = d3.scale.linear().range([0, this.width()]);
+      this.xScale = d3.scale.ordinal().range([0, this.width()]);
       this.yScale = d3.scale.linear().range([this.height(), 0]);
 
       this.xAxis = d3.svg.axis()
@@ -145,6 +149,7 @@
     },
 
     showIncomeClusterGroups: function () {
+      this.removeCurrentGraph();
       var groupedBarChart = charts.GroupedBarChart()
                               .yScale(this.yScale)
                               .xScale(this.xScale)
@@ -172,16 +177,16 @@
           };
       });
 
-      console.log(barData);
-
       d3.select(".svg-chart-area")
         .datum(barData)
         .call(groupedBarChart);
 
+      this.currentGraph = groupedBarChart;
       this.setText('Hello, this is a long story of text that I am now writing', '#graph2', true);
     },
 
     showGender: function () {
+      this.removeCurrentGraph();
       var groupedBarChart = charts.StackedBar()
                               .yScale(this.yScale)
                               .xScale(this.xScale)
@@ -195,39 +200,25 @@
                               .yTitle('Percentage')
                               .xTitle('Cluster Groups');
 
-      /*var barData = _.values(_.reduce(data.clusterSizes, function (sum, ic) {
-        sum["females"].push(
-          {
-            x: ic.clusterGroup,
-            name: "Female",
-            y: parseInt((ic.female / ic.size) * 100, 10)
-          });
-
-        sum["males"].push({
-            x: ic.clusterGroup,
-            name: "Male",
-            y: parseInt((ic.male / ic.size) * 100, 10)
-          });
-
-        return sum;
-      }, {"females":[], "males":[]}));*/
-
-      var barData = _.map(data.clusterSizes, function (ic) {
+       var barData = _.map(data.clusterSizes, function (ic) {
         var y0 = 0;
           return {
             name: ic.clusterGroup,
+            size: ic.size,
             points: [
               {
                 name: "Male",
-                value: parseInt((ic.male / ic.size) * 100, 10),
+                value: ic.male,
+                size: ic.size,
                 y0: y0,
-                y1: y0 += parseInt((ic.male / ic.size) * 100, 10)
+                y1: y0 += ic.male 
               },
               {
                 name: "Female",
-                value: parseInt((ic.female / ic.size) * 100, 10),
+                value: ic.female,
+                size: ic.size,
                 y0: y0,
-                y1: y0 += parseInt((ic.female / ic.size) * 100, 10)
+                y1: y0 += ic.female
               }
             ]
           };
@@ -239,11 +230,14 @@
         .datum(barData)
         .call(groupedBarChart);
 
+      this.currentChart = groupedBarChart;
       this.setText('Hello, this is a long story of text that I am now writing','#graph2', true);
     },
 
-    showGenderOld: function () {
-      var groupedBarChart = charts.GroupedBarChart()
+    showJoinYear: function () {
+      this.removeCurrentGraph();
+
+      var lineGraph = charts.LineGraph()
                               .yScale(this.yScale)
                               .xScale(this.xScale)
                               .yAxis(this.yAxis)
@@ -251,36 +245,38 @@
                               .margin(this.margin)
                               .width(this.windowWidth() - 100)
                               .height(this.windowHeight())
-                              .xColumns(["1", "2", "3", "4", "5", "6", "7"])
-                              .xGroups(["Male", "Female"])
-                              .yTitle('Percentage')
-                              .xTitle('Cluster Groups');
+                              .xColumns(_.map(_.range(1985, 2014), function (d) { return d.toString();}))
+                              //.xGroups(["Male", "Female"])
+                              .yTitle('Number of people joined')
+                              .xTitle('Year');
 
-      var barData = _.map(data.clusterSizes, function (ic) {
-          return {
-            name: ic.clusterGroup,
-            points: [
-              {
-                name: "Female",
-                y0: 0,
-                y1: parseInt((ic.female / ic.size) * 100, 10)
-              },
-              {
-                name: "Male",
-                value: parseInt((ic.male / ic.size) * 100, 10)
-              }
-            ]
-          };
+      var lineData = _.map(data.clusterSizes, function (ic) {
+        return {
+          name: ic.clusterGroup,
+          points: _.map(ic.joinYear, function (val, key) { 
+            return {
+              value: val,
+              date: key
+            };
+          })
+        };
       });
 
-      console.log(barData);
+      console.log(lineData);
       d3.select(".svg-chart-area")
-        .datum(barData)
-        .call(groupedBarChart);
+        .datum(lineData)
+        .call(lineGraph);
 
-      this.setText('Hello, this is a long story of text that I am now writing','#graph2', true);
+      this.currentChart = lineGraph;
+      this.setText('Hello, this is a long story of text that I am now writing','#graph3', true);
+
     },
 
+    removeCurrentGraph: function () {
+      if (this.currentChart) { 
+        this.currentChart.remove();
+      }
+    },
 
     margin: {
       top: 0, 
@@ -343,18 +339,23 @@
   var AppRouter = Backbone.Router.extend({
 
       routes: {
-        "graph1":                 "graph1",    // #help
-        "graph2":                 "graph2",    // #help
+        "graph1":                 "graph1",
+        "graph2":                 "graph2",
+        "graph3":                 "graph3",
         "(/)": "start"   
       },
 
       graph1: function() {
         app.hideIntro();
-        app.showGender(data.clusterSizes);
+        app.showGender();
       },
 
       graph2: function() {
-        app.showIncomeClusterGroups(data.IncomeCluster);
+        app.showJoinYear();
+      },
+
+      graph3: function() {
+        app.showIncomeClusterGroups();
       },
 
       start: function(query, page) {
@@ -368,7 +369,6 @@
     var promise = $.getJSON('/ixio-challenge/_all_docs?include_docs=true&limit=5000');
     promise.then(function (resp) {
       dataStructure(data, resp.rows);
-      console.log('data', data);
       app.initialize(data);
       router = new AppRouter();
       Backbone.history.start();

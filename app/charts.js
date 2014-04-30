@@ -428,10 +428,16 @@ value: 3938
       }
 
       chart.remove = function () {
-        chart.legend
-          .transition()
-          .duration(500);
-      };
+       var cause = d3.selectAll(".income");
+
+       cause
+        .style("fill-opacity", 1)
+        .transition()
+        .duration(1500)
+        .style("fill-opacity", 1e-6)
+        .remove();
+
+     };
 
       _.extend(chart, chartMixins);
 
@@ -464,6 +470,8 @@ charts.StackedBar = function () {
           height = chart.height() - margin.top - margin.bottom,
           svg = d3.select(this);
 
+      chart.svg = svg;
+
       x0.rangeRoundBands([0, width], 0.4);
 
         // Transpose the data into layers by cause.
@@ -475,11 +483,12 @@ charts.StackedBar = function () {
         }));*/
         // Compute the x-domain (by date) and y-domain (by top).
         //color.domain(xGroups);
+        console.log('da', data, d3.max(_.map(data, function (d) { return d.size;})));
         x0.domain(xColumns);
         yScale123.range([0, height])
-            .domain([0, 100]);
+            .domain([0, 5000]);
 
-        var y = d3.scale.linear().rangeRound([height, 0]).domain([0, 100]);
+        var y = d3.scale.linear().rangeRound([height, 0]).domain([0, d3.max(_.map(data, function (d) { return d.size;}))]);
 
         yAxis
           .scale(y)
@@ -499,20 +508,28 @@ charts.StackedBar = function () {
           .enter()
             .append("rect")
             //.attr("x", function(d) { return x0(d.x); })
-            .attr("height", function(d) { console.log('d', d); return y(d.y0) - y(d.y1); })
-            .attr("y", function(d) { return y(d.y1); })
+            .attr("y", function(d) { return y(0); })
+            .attr("height", function(d) { return height - y(0); })
             .style("fill", function(d, i) { console.log(d); return color[d.name]; })
-            .attr("width", x0.rangeBand());
+            .attr("width", x0.rangeBand())
+            .transition()
+            .duration(800)
+            .attr("height", function(d) { console.log('d', d); return y(d.y0) - y(d.y1); })
+            .attr("y", function(d) { return y(d.y1); });
          
           cause.selectAll('text')
             .data(function (d) {return d.points;})
            .enter()
             .append("text")
+            .style("fill-opacity", 1e-6)
+            .transition()
+            .duration(2500)
+            .style("fill-opacity", 1)
             .attr('x', x0.rangeBand()/2 - 7)
-            .attr("y", function (d) {return y(d.y1) + 10;})
+            .attr("y", function (d) {return (y(d.y1) + y(d.y0))/2;})
             .attr("dy", ".35em")
             .style("text-anchor", "middle")
-            .text(function(d) { return d.value + "% " + d.name; });
+            .text(function(d) { return d.value + " " + d.name + "(" + parseInt((d.value / d.size) * 100, 10) + "%)"; });
 
         svg.select('.x.axis')
             .attr("transform", "translate(0," + height + ")")
@@ -543,6 +560,25 @@ charts.StackedBar = function () {
 
      });
 
+     chart.remove = function () {
+       var bars = chart.svg.selectAll(".cause"),
+           legend = chart.svg.selectAll(".legend");
+       
+       legend
+        .style("fill-opacity", 1)
+        .transition()
+        .duration(1500)
+        .style("fill-opacity", 1e-6)
+        .remove();
+
+       bars
+        .style("fill-opacity", 1)
+        .transition()
+        .duration(1000)
+        .style("fill-opacity", 1e-6)
+        .remove();
+
+     };
   }
   
   _.extend(chart, chartMixins);
@@ -550,5 +586,155 @@ charts.StackedBar = function () {
   return chart;
 
 };
+
+charts.LineGraph = function () {
+  var x0 = d3.scale.ordinal();
+  var color = d3.scale.category20c();
+
+  function chart(selection) {
+    var yAxis = chart.yAxis(),
+              xAxis = chart.xAxis(),
+              //yScale = chart.yScale(),
+              //xScale = chart.xScale(),
+              xScale = d3.scale.ordinal(),
+              yScale = d3.scale.linear(),
+              margin = chart.margin(),
+              xColumns = chart.xColumns(),
+              line = d3.svg.line()
+                              .interpolate("monotone")
+                              .x(function (d, i) { return xScale(d.date);})
+                              .y(function (d) { return yScale(d.value);});
+
+    xAxis.scale(xScale).orient("bottom");
+
+    selection.each(function (data) {
+
+      var width = chart.width(), // - margin.left - margin.right,
+          height = chart.height() - margin.top - margin.bottom,
+          svg = d3.select(this);
+
+        chart.svg = svg;
+        //console.log('da', data, d3.max(_.map(data, function (d) { return d.size;})));
+        var allPoints = _.reduce(data, function (all, d) {
+          return all.concat(_.map(d.points, function (p) { return p.value;}));
+        }, []);
+
+        console.log('xco', xColumns);
+        xScale
+        .domain(xColumns)
+        .rangeRoundBands([0, width + margin.left]);
+
+        yScale.range([height, 0])
+            .domain([0, d3.max(allPoints)]);
+
+        yAxis
+          .scale(yScale)
+          .orient("left")
+          .tickFormat(d3.format(".2s"));
+
+        var startData = [],
+            endData = [];
+
+        _.each(data, function (d) {
+          startData.push({
+            name: d.name,
+            points: []
+          });
+
+          endData.push({
+            name: d.name,
+            points: d.points.slice(0)
+          });
+        });
+        // Add a group for each cause.
+            console.log('sd', startData);
+        var lineGroup = svg.selectAll(".line-group")
+            .data(startData, function (d) { return d.name;});
+
+        var LinesEnter = lineGroup
+          .enter()
+          .append("g")
+          .attr('class', 'line-group')
+            .append("path")
+            .attr('class', 'line')
+            .style('stroke', function (d, i) { return color(i);});
+
+          function tick () {
+        // Add a rect for each column.
+        var lines = lineGroup.selectAll(".line")
+            .data(function (d) {return [d.points];});
+
+            lines
+            .attr("d", line);
+            /*.attr("transform",function "translate("+ -width + yScale( +", 0)")
+            .transition()
+            .duration(100)
+            .ease("linear")
+            .attr("transform", "translate(0, 0)");*/
+
+           if (startData[0].points.length === data[0].points.length) {
+             console.log('done');
+            return;
+           }
+
+           window.setTimeout(function () {
+             _.each(startData, function (st, i) {
+               st.points.push(endData[i].points.shift());
+             });
+            
+             tick();
+           }, 150);
+
+          }
+
+          tick();
+
+          svg.select('.x.axis')
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+
+          svg.select('.y.axis')
+            .call(yAxis);
+
+         /*var legend = svg.selectAll(".legend")
+            .data(xGroups.reverse())
+          .enter().append("g")
+          .attr("class", "legend")
+          .attr("transform", function(d, i) { return "translate(30," + i * 20 + ")"; });
+
+          legend.append("rect")
+          .attr("x", width - 58)
+          .attr("width", 18)
+          .attr("height", 18)
+          .style("fill", function (d) { return color[d];});
+
+          legend.append("text")
+          .attr("x", width + 20)
+          .attr("y", 9)
+          .attr("dy", ".35em")
+          .style("text-anchor", "end")
+          .text(function(d) { return d; });*/
+
+     });
+
+     chart.remove = function () {
+       var cause = chart.svg.selectAll(".line-group");
+
+       cause
+        .style("fill-opacity", 1)
+        .transition()
+        .duration(1000)
+        .style("fill-opacity", 1e-6)
+        .remove();
+
+     };
+  }
+  
+  _.extend(chart, chartMixins);
+
+  return chart;
+
+};
+
 
 })(window, window.$, window.d3, window._);
