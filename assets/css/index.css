@@ -5772,8 +5772,9 @@ button.close {
     display: none !important;
   }
 }
+svg text,
 body {
-  font-family: 'Oswald', 'sans-serif';
+  font-family: 'Ubuntu', sans-serif;
 }
 .col-lg-12 {
   padding-left: 0;

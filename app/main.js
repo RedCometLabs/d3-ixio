@@ -22,6 +22,16 @@
             g: 0,
             h: 0,
             i: 0
+          },
+          language: {
+            "English": 0,
+            "Afrikaans": 0
+          },
+          culturalProfile: {
+            "1": 0,
+            "2": 0,
+            "3": 0,
+            "4": 0
           }
         };
 
@@ -37,12 +47,15 @@
       var income = doc.income === "" ? "unknown" : doc.income.toLowerCase() ;
       group.income[income] = group.income[income] + 1;
       group.joinYear[doc.joinYear] =  group.joinYear[doc.joinYear] + 1;
+      group.language[doc.language] += 1;
+      group.culturalProfile[doc.culturalProfile] += 1;
 
       if (doc.gender === "Female") {
         group.female = group.female + 1;
       } else {
         group.male = group.male + 1;
       }
+
       return info;
     }, {}));
 
@@ -245,7 +258,7 @@
                               .margin(this.margin)
                               .width(this.windowWidth() - 100)
                               .height(this.windowHeight())
-                              .xColumns(_.map(_.range(1985, 2014), function (d) { return d.toString();}))
+                              .xColumns(_.map(_.range(1985, 2014), function (d) { return d}))
                               //.xGroups(["Male", "Female"])
                               .yTitle('Number of people joined')
                               .xTitle('Year');
@@ -270,6 +283,50 @@
       this.currentChart = lineGraph;
       this.setText('Hello, this is a long story of text that I am now writing','#graph3', true);
 
+    },
+
+    showRadialInfo: function () {
+      this.removeCurrentGraph();
+
+       var radialData = _.map(data.clusterSizes, function (ic) {
+         var axi = [];
+         _.each(['language', 'culturalProfile'], function (group) {
+           _.each(ic[group], function (val, key) {
+             var axis = key;
+             if (group === 'culturalProfile') {
+                axis = 'Cultural Profile ' + key;
+             }
+
+             axi.push({
+               axis: axis,
+               value: val / ic.size
+             });
+           });
+         });
+           return axi;
+       });
+
+
+       var radialGraph = charts.RadialGraph()
+                              .yScale(this.yScale)
+                              .xScale(this.xScale)
+                              .yAxis(this.yAxis)
+                              .xAxis(this.xAxis)
+                              .margin(this.margin)
+                              .width(this.windowWidth() - 100)
+                              .height(this.windowHeight())
+                              .xColumns(_.map(data.clusterSizes, function (d) { return 'Cluster Group ' + d.clusterGroup;}))
+                              //.xGroups(["Male", "Female"])
+                              .yTitle('Number of people joined')
+                              .xTitle('Year');
+
+      console.log(radialData);
+      d3.select(".svg-chart-area")
+        .datum(radialData)
+        .call(radialGraph);
+
+      this.currentChart = radialGraph;
+      this.setText('Hello, this is a long story of text that I am now writing','#graph3', true);
     },
 
     removeCurrentGraph: function () {
@@ -342,6 +399,7 @@
         "graph1":                 "graph1",
         "graph2":                 "graph2",
         "graph3":                 "graph3",
+        "graph4":                 "graph4",
         "(/)": "start"   
       },
 
@@ -351,11 +409,15 @@
       },
 
       graph2: function() {
-        app.showJoinYear();
+        app.showRadialInfo();
       },
 
       graph3: function() {
         app.showIncomeClusterGroups();
+      },
+
+      graph4: function() {
+        app.showJoinYear();
       },
 
       start: function(query, page) {
