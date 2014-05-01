@@ -106,7 +106,7 @@ module.exports = function (grunt) {
   grunt.loadTasks('tasks');
 
   // Default task
-  grunt.registerTask('dev', ['clean', 'less']);
+  grunt.registerTask('dev', ['clean', 'jshint','less']);
   grunt.registerTask('default', ['dev', 'couchserver']);
   //grunt.registerTask('release', ['clean', 'jshint', ]);
 };

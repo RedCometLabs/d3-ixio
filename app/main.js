@@ -194,7 +194,7 @@
         .datum(barData)
         .call(groupedBarChart);
 
-      this.currentGraph = groupedBarChart;
+      this.currentChart = groupedBarChart;
       this.setText('Hello, this is a long story of text that I am now writing', '#graph2', true);
     },
 
@@ -258,7 +258,7 @@
                               .margin(this.margin)
                               .width(this.windowWidth() - 100)
                               .height(this.windowHeight())
-                              .xColumns(_.map(_.range(1985, 2014), function (d) { return d}))
+                              .xColumns(_.map(_.range(1985, 2014), function (d) { return d;}))
                               //.xGroups(["Male", "Female"])
                               .yTitle('Number of people joined')
                               .xTitle('Year');
@@ -428,25 +428,12 @@
 
 
   $(function () {
-    var promise = $.getJSON('/ixio-challenge/_all_docs?include_docs=true&limit=5000');
+    var promise = $.getJSON('/ixio-challenge/_all_docs?include_docs=true&limit=10000');
     promise.then(function (resp) {
       dataStructure(data, resp.rows);
       app.initialize(data);
       router = new AppRouter();
       Backbone.history.start();
-      /*var lineChart = charts.Line()
-        .width($("#line-chart-product-join-time").width())
-        .height(100);
-
-      d3.select("#line-chart-product-join-time")
-        .datum(data)
-        .call(lineChart);*/
-
-      //var bubbleChart = charts.Bubble().diameter($("#bubble").width());
-      //d3.select("#bubble").datum(data.clusterSizes).call(bubbleChart);
-      //var groupedBarChart = charts.GroupedBarChart().width($("#grouped-bar").width()).height(500).yTitle('Percentage').xTitle('Income Group');
-      //d3.select("#grouped-bar").datum(data.IncomeCluster).call(groupedBarChart);
-
     });
   });
 

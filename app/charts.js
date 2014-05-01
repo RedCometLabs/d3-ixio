@@ -277,11 +277,15 @@
           return "<strong>"+ d.name + ":</strong> <span style=' color:"+ color(d.name) +"'>" + parseInt(d.value, 10) + "%</span>";
         });
 
-        var svg = d3.select(this); 
+        var svg = d3.select(this),
+            g = svg.append('g').attr('class', 'grouped');
+
+
+        chart.svg = g;
+
 
         svg.call(tip);
 
-        console.log('svg', svg);
         svg.select('.x.axis')
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis);
@@ -295,7 +299,7 @@
         .style("text-anchor", "end")
         .text(chart.yTitle());
 
-        var income = svg.selectAll(".income")
+        var income = g.selectAll(".income")
         .data(data, function (d) { return d.name; });
 
         income
@@ -313,7 +317,7 @@
         .append("rect")
         .attr("class", "group-bar")
         .attr("width", x1.rangeBand())
-        .attr("x", function(d) { console.log('x1', d); return x1(d.name); })
+        .attr("x", function(d) { return x1(d.name); })
         .attr("y", function(d) { return yScale(0); })
         .attr("height", function(d) { return height - yScale(0); })
         .style("fill", function(d) { return color(d.name); })
@@ -328,7 +332,7 @@
         .exit()
         .remove();
 
-        var legend = svg.selectAll(".legend")
+        var legend = g.selectAll(".legend")
         .data(xGroups.reverse())
         .enter().append("g")
         .attr("class", "legend")
@@ -347,13 +351,12 @@
         .style("text-anchor", "end")
         .text(function(d) { return d; });
       });
-
     }
 
     chart.remove = function () {
-      var cause = d3.selectAll(".income");
+      var graph = chart.svg;
 
-      cause
+      graph
       .style("fill-opacity", 1)
       .transition()
       .duration(1500)
@@ -660,6 +663,7 @@
   };
 
   charts.RadialGraph = function () {
+    /*jshint loopfunc: true */
     function chart(selection) {
       selection.each(function (d) {
         var margin = chart.margin(),
@@ -669,7 +673,7 @@
           w: chart.width() - margin.left - margin.right,
           h: chart.height() -30- margin.top - margin.bottom,
           factor: 1,
-          factorLegend: .85,
+          factorLegend: 0.85,
           levels: 3,
           maxValue: 0,
           radians: 2 * Math.PI,
@@ -684,11 +688,11 @@
 
         chart.color = cfg.color;
 
-        cfg.maxValue = Math.max(cfg.maxValue, d3.max(d, function(i){return d3.max(i.map(function(o){return o.value;}))}));
-        var allAxis = (d[0].map(function(i, j){return i.axis}));
+        cfg.maxValue = Math.max(cfg.maxValue, d3.max(d, function(i){return d3.max(i.map(function(o){return o.value;}));}));
+        var allAxis = (d[0].map(function(i, j){return i.axis;}));
         var total = allAxis.length;
         var radius = cfg.factor*Math.min(cfg.w/2, cfg.h/2);
-        var Format = d3.format('%');
+        var format = d3.format('%');
 
         //d3.select(this).select("svg").remove();
 
@@ -698,12 +702,14 @@
         .attr("transform", "translate(" + cfg.TranslateX + "," + cfg.TranslateY + ")");
 
         
-        var tooltip;
+        var tooltip,
+            levelFactor,
+            j;
         chart.svg = g;
 
         //Circular segments
-        for(var j=0; j<cfg.levels-1; j++){
-          var levelFactor = cfg.factor*radius*((j+1)/cfg.levels);
+        for(j=0; j<cfg.levels-1; j++){
+          levelFactor = cfg.factor*radius*((j+1)/cfg.levels);
           g.selectAll(".levels")
           .data(allAxis)
           .enter()
@@ -719,9 +725,10 @@
           .attr("transform", "translate(" + (cfg.w/2-levelFactor) + ", " + (cfg.h/2-levelFactor) + ")");
         }
 
+        var series;
         //Text indicating at what % each level is
-        for(var j=0; j<cfg.levels; j++){
-          var levelFactor = cfg.factor*radius*((j+1)/cfg.levels);
+        for(j=0; j<cfg.levels; j++){
+          levelFactor = cfg.factor*radius*((j+1)/cfg.levels);
           g.selectAll(".levels")
           .data([1]) //dummy data
           .enter()
@@ -733,7 +740,7 @@
           .style("font-size", "10px")
           .attr("transform", "translate(" + (cfg.w/2-levelFactor + cfg.ToRight) + ", " + (cfg.h/2-levelFactor) + ")")
           .attr("fill", "#737373")
-          .text(Format((j+1)*cfg.maxValue/cfg.levels));
+          .text(format((j+1)*cfg.maxValue/cfg.levels));
         }
 
         series = 0;
@@ -755,16 +762,17 @@
 
         axis.append("text")
         .attr("class", "legend")
-        .text(function(d){return d})
+        .text(function(d){return d;})
         .style("font-family", "sans-serif")
         .style("font-size", "11px")
         .attr("text-anchor", "middle")
         .attr("dy", "1.5em")
-        .attr("transform", function(d, i){return "translate(0, -10)"})
+        .attr("transform", "translate(0, -10)")
         .attr("x", function(d, i){return cfg.w/2*(1-cfg.factorLegend*Math.sin(i*cfg.radians/total))-60*Math.sin(i*cfg.radians/total);})
         .attr("y", function(d, i){return cfg.h/2*(1-Math.cos(i*cfg.radians/total))-20*Math.cos(i*cfg.radians/total);});
 
 
+        var dataValues;
         d.forEach(function(y, x){
           dataValues = [];
           g.selectAll(".nodes")
@@ -789,16 +797,16 @@
             }
             return str;
           })
-          .style("fill", function(j, i){return cfg.color(series)})
+          .style("fill", function(j, i){return cfg.color(series);})
           .style("fill-opacity", cfg.opacityArea)
           .on('mouseover', function (d){
-            z = "polygon."+d3.select(this).attr("class");
+            var z = "polygon."+d3.select(this).attr("class");
             g.selectAll("polygon")
             .transition(200)
             .style("fill-opacity", 0.1); 
             g.selectAll(z)
             .transition(200)
-            .style("fill-opacity", .7);
+            .style("fill-opacity", 0.7);
           })
           .on('mouseout', function(){
             g.selectAll("polygon")
@@ -816,7 +824,7 @@
           .append("svg:circle")
           .attr("class", "radar-chart-serie"+series)
           .attr('r', cfg.radius)
-          .attr("alt", function(j){return Math.max(j.value, 0)})
+          .attr("alt", function(j){return Math.max(j.value, 0);})
           .attr("cx", function(j, i){
             dataValues.push([
               cfg.w/2*(1-(parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor*Math.sin(i*cfg.radians/total)), 
@@ -827,26 +835,26 @@
           .attr("cy", function(j, i){
             return cfg.h/2*(1-(Math.max(j.value, 0)/cfg.maxValue)*cfg.factor*Math.cos(i*cfg.radians/total));
           })
-          .attr("data-id", function(j){return j.axis})
-          .style("fill", cfg.color(series)).style("fill-opacity", .9)
+          .attr("data-id", function(j){return j.axis;})
+          .style("fill", cfg.color(series)).style("fill-opacity", 0.9)
           .on('mouseover', function (d){
-            newX =  parseFloat(d3.select(this).attr('cx')) - 10;
-            newY =  parseFloat(d3.select(this).attr('cy')) - 5;
+            var newX =  parseFloat(d3.select(this).attr('cx')) - 10;
+            var newY =  parseFloat(d3.select(this).attr('cy')) - 5;
 
             tooltip
             .attr('x', newX)
             .attr('y', newY)
-            .text(Format(d.value))
+            .text(format(d.value))
             .transition(200)
             .style('opacity', 1);
 
-            z = "polygon."+d3.select(this).attr("class");
+            var z = "polygon."+d3.select(this).attr("class");
             g.selectAll("polygon")
             .transition(200)
             .style("fill-opacity", 0.1); 
             g.selectAll(z)
             .transition(200)
-            .style("fill-opacity", .7);
+            .style("fill-opacity", 0.7);
           })
           .on('mouseout', function(){
             tooltip
@@ -857,7 +865,7 @@
             .style("fill-opacity", cfg.opacityArea);
           })
           .append("svg:title")
-          .text(function(j){return Math.max(j.value, 0)});
+          .text(function(j){return Math.max(j.value, 0);});
 
           series++;
         });
@@ -883,11 +891,11 @@
           .attr("transform", "translate(" + cfg.TranslateX + "," + cfg.TranslateY + ")");
       });
 
-    };
+    }
 
     chart.createLegend = function (legendOptions, mainSvg) {
       console.log(legendOptions);
-      var margin = chart.margin()
+      var margin = chart.margin(),
           w = chart.width() - margin.left - margin.right,
           h = chart.height() - margin.top - margin.bottom,
           colorscale = chart.color;
@@ -895,7 +903,7 @@
       var svg = mainSvg
       .append('g')
       .attr("width", 100)
-      .attr("height", 200)
+      .attr("height", 200);
 
       //Initiate Legend	
       var legend = svg.append("g")
@@ -914,7 +922,7 @@
       .attr("width", 15)
       .attr("height", 15)
       .style("fill", function(d, i){ return colorscale(i);})
-      .attr('class', function (d, i) { return 'radar-chart-serie' + i;})
+      .attr('class', function (d, i) { return 'radar-chart-serie' + i;});
       
       //Create text next to squares
       legend.selectAll('text')
