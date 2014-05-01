@@ -8,6 +8,7 @@
       if (!info[cg]) {
         info[cg] = {
           clusterGroup: cg,
+          name: cg,
           size: 0,
           male: 0,
           female: 0,
@@ -32,6 +33,20 @@
             "2": 0,
             "3": 0,
             "4": 0
+          },
+
+          favouredProduct: {
+            "Null": 0,
+            "Product1":0,
+            "Product2":0,
+            "Product3":0,
+            "Product4":0,
+            "Product5":0,
+            "Product6":0,
+            "Product7":0,
+            "Product8":0,
+            "Product9":0,
+            "Product10":0
           }
         };
 
@@ -43,12 +58,13 @@
 
       var group = info[cg];
 
-      group.size = group.size + 1;
+      group.size += 1;
       var income = doc.income === "" ? "unknown" : doc.income.toLowerCase() ;
-      group.income[income] = group.income[income] + 1;
-      group.joinYear[doc.joinYear] =  group.joinYear[doc.joinYear] + 1;
+      group.income[income] += 1;
+      group.joinYear[doc.joinYear] +=  1;
       group.language[doc.language] += 1;
       group.culturalProfile[doc.culturalProfile] += 1;
+      group.favouredProduct[doc.favouredProduct] += 1;
 
       if (doc.gender === "Female") {
         group.female = group.female + 1;
@@ -285,6 +301,44 @@
 
     },
 
+    showProduct: function () {
+      this.removeCurrentGraph();
+
+      var forceBubble = charts.ForceBubble()
+                              .yScale(this.yScale)
+                              .xScale(this.xScale)
+                              .yAxis(this.yAxis)
+                              .xAxis(this.xAxis)
+                              .margin(this.margin)
+                              .width(this.windowWidth() - 100)
+                              .height(this.windowHeight())
+                              .xColumns(["1", "2", "3", "4", "5", "6", "7"])
+                              //.xGroups(["Male", "Female"])
+                              .yTitle('Number of people joined')
+                              .xTitle('Year');
+
+      var forceData = _.map(data.clusterSizes, function (ic) {
+        return {
+          name: ic.name,
+          nodes: _.map(ic.favouredProduct, function (val, key) {
+            return {
+              value: parseInt((val / ic.size) * 100, 10),
+              name: key
+            };
+          })
+        };
+      });
+
+      console.log(forceData);
+      d3.select(".svg-chart-area")
+        .datum(forceData)
+        .call(forceBubble);
+
+      this.currentChart = forceBubble;
+      this.setText('Hello, this is a long story of text that I am now writing','#graph3', true);
+
+    },
+
     showRadialInfo: function () {
       this.removeCurrentGraph();
 
@@ -400,6 +454,7 @@
         "graph2":                 "graph2",
         "graph3":                 "graph3",
         "graph4":                 "graph4",
+        "graph5":                 "graph5",
         "(/)": "start"   
       },
 
@@ -418,6 +473,10 @@
 
       graph4: function() {
         app.showJoinYear();
+      },
+
+      graph5: function() {
+        app.showProduct();
       },
 
       start: function(query, page) {

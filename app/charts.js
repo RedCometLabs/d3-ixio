@@ -278,7 +278,7 @@
         });
 
         var svg = d3.select(this),
-            g = svg.append('g').attr('class', 'grouped');
+        g = svg.append('g').attr('class', 'grouped');
 
 
         chart.svg = g;
@@ -400,16 +400,6 @@
 
         x0.rangeRoundBands([0, width], 0.4);
 
-        // Transpose the data into layers by cause.
-        // [{value: male-x, name: ClusterGroup}, {
-        /*var stackedValues = d3.layout.stack()(xStacks.map(function(cause) {
-          return crimea.map(function(d) {
-          return {x: parse(d.date), y: +d[cause]};
-          });
-          }));*/
-        // Compute the x-domain (by date) and y-domain (by top).
-        //color.domain(xGroups);
-        console.log('da', data, d3.max(_.map(data, function (d) { return d.size;})));
         x0.domain(xColumns);
         yScale123.range([0, height])
         .domain([0, 5000]);
@@ -540,7 +530,7 @@
         svg = d3.select(this);
 
         chart.svg = svg;
-        //console.log('da', data, d3.max(_.map(data, function (d) { return d.size;})));
+
         var allPoints = _.reduce(data, function (all, d) {
           return all.concat(_.map(d.points, function (p) { return p.value;}));
         }, []);
@@ -592,11 +582,6 @@
 
           lines
           .attr("d", line);
-          /*.attr("transform",function "translate("+ -width + yScale( +", 0)")
-            .transition()
-            .duration(100)
-            .ease("linear")
-            .attr("transform", "translate(0, 0)");*/
 
           if (startData[0].points.length === data[0].points.length) {
             console.log('done');
@@ -701,10 +686,10 @@
         .attr('class', 'radial')
         .attr("transform", "translate(" + cfg.TranslateX + "," + cfg.TranslateY + ")");
 
-        
+
         var tooltip,
-            levelFactor,
-            j;
+        levelFactor,
+        j;
         chart.svg = g;
 
         //Circular segments
@@ -885,10 +870,10 @@
 
 
         g.attr("transform", "translate(-800, -800)")
-          .transition()
-          .ease("cubic-out")
-          .duration(1000)
-          .attr("transform", "translate(" + cfg.TranslateX + "," + cfg.TranslateY + ")");
+        .transition()
+        .ease("cubic-out")
+        .duration(1000)
+        .attr("transform", "translate(" + cfg.TranslateX + "," + cfg.TranslateY + ")");
       });
 
     }
@@ -896,9 +881,9 @@
     chart.createLegend = function (legendOptions, mainSvg) {
       console.log(legendOptions);
       var margin = chart.margin(),
-          w = chart.width() - margin.left - margin.right,
-          h = chart.height() - margin.top - margin.bottom,
-          colorscale = chart.color;
+      w = chart.width() - margin.left - margin.right,
+      h = chart.height() - margin.top - margin.bottom,
+      colorscale = chart.color;
 
       var svg = mainSvg
       .append('g')
@@ -923,7 +908,7 @@
       .attr("height", 15)
       .style("fill", function(d, i){ return colorscale(i);})
       .attr('class', function (d, i) { return 'radar-chart-serie' + i;});
-      
+
       //Create text next to squares
       legend.selectAll('text')
       .data(legendOptions)
@@ -941,11 +926,174 @@
       var graph = chart.svg;
 
       graph
-          .transition()
-          .ease("cubic-out")
-          .duration(1000)
-          .attr("transform", "translate(-800, -800)")
-          .remove();
+      .transition()
+      .ease("cubic-out")
+      .duration(1000)
+      .attr("transform", "translate(-800, -800)")
+      .remove();
+    };
+
+    _.extend(chart, chartMixins);
+
+    return chart;
+
+  };
+
+
+  charts.ForceBubble = function () {
+
+    function chart(selection) {
+      var margin = chart.margin(),
+        width = chart.width() - margin.left - margin.right,
+        height = chart.height() - margin.top - margin.bottom,
+        padding = 6, // separation between nodes
+        maxRadius = 12,
+        groups = chart.xColumns(),
+        tick,
+        nodes = [];
+
+      selection.each(function (data) {
+
+        var padding = 6, // separation between nodes
+            maxRadius = 10;
+
+        //var n = 200, // total number of nodes
+        var m = data.length; // number of distinct clusters
+
+        var color = d3.scale.category10()
+                      .domain(groups);
+
+        var x = d3.scale.ordinal()
+        .domain(groups)
+        .rangePoints([0, width -margin.left - margin.right], 1);
+
+        var nodes = [];
+        _.each(data, function (d, i) {
+           var node = _.map(d.nodes, function(node) {
+            //var i = Math.floor(Math.random() * m),
+            //v = (i + 1) / m * -Math.log(Math.random());
+            var v = node.value;
+            return {
+              name: node.name,
+              radius: Math.sqrt(v) * maxRadius,
+              color: color(d.name),
+              cx: x(d.name),
+              cy: i % 2 === 0 ? height / 2 : height/3
+            };
+          });
+
+          nodes = nodes.concat(node);
+        });
+
+
+        var svg = d3.select(this);
+
+        var circleNode = svg.selectAll('.circleNodes')
+                          .data(nodes)
+                          .enter()
+                          .append('g')
+                          .attr("transform", function(d) { 
+                            return "translate(" + d.x + ","+ d.y + ")"; });
+
+        var circle = circleNode
+          .append("circle")
+          .attr("r", function(d) { return d.radius; })
+          .style("fill", function(d) { return d.color; });
+
+        circleNode
+          .append('text')
+          .attr("x", 0)
+          .attr("y", ".31em")
+          .attr("text-anchor", "middle")
+          .style('stroke', '#000')
+          .text(function(d) { return d.name.replace('Product', ''); });
+
+        function tick(e) {
+          circleNode
+          .each(gravity(0.2 * e.alpha))
+          .each(collide(0.5))
+          .attr("transform", function(d) { 
+              return "translate(" + d.x + ","+ d.y + ")"; });
+          //.attr("x", function(d) { return d.x; })
+          //.attr("y", function(d) { return d.y; });
+        }
+
+        var force = d3.layout.force()
+        .nodes(nodes)
+        .size([width, height])
+        .gravity(0)
+        .charge(0)
+        .on("tick", tick)
+        .start();
+
+        circleNode
+        .call(force.drag);
+
+        chart.circleNode = circleNode;
+        chart.force = force;
+       
+
+        // Move nodes toward cluster focus.
+        function gravity(alpha) {
+          return function(d) {
+            d.y += (d.cy - d.y) * alpha;
+            d.x += (d.cx - d.x) * alpha;
+          };
+        }
+
+        // Resolve collisions between nodes.
+        function collide(alpha) {
+          var quadtree = d3.geom.quadtree(nodes);
+          return function(d) {
+            var r = d.radius + maxRadius + padding,
+            nx1 = d.x - r,
+            nx2 = d.x + r,
+            ny1 = d.y - r,
+            ny2 = d.y + r;
+            quadtree.visit(function(quad, x1, y1, x2, y2) {
+              if (quad.point && (quad.point !== d)) {
+                var x = d.x - quad.point.x,
+                y = d.y - quad.point.y,
+                l = Math.sqrt(x * x + y * y),
+                r = d.radius + quad.point.radius + (d.color !== quad.point.color) * padding;
+                if (l < r) {
+                  l = (l - r) / l * alpha;
+                  d.x -= x *= l;
+                  d.y -= y *= l;
+                  quad.point.x += x;
+                  quad.point.y += y;
+                }
+              }
+              return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
+            });
+          };
+        }
+      });
+
+    }
+
+    chart.remove = function () {
+      var force = chart.force,
+          circleNode = chart.circleNode;
+
+      var newTick = function () {
+        circleNode
+          .each(function (d) {
+            d.x += (d.cx + d.x) * 0.01;
+          })
+          .attr("transform", function(d) { 
+          return "translate(" + d.x + ","+ d.y + ")";
+          });
+      };
+
+      force.on('tick', newTick);
+      force.resume();
+
+      window.setTimeout(function () {
+        force.stop();
+        circleNode.remove();
+      }, 1000);
+
     };
 
     _.extend(chart, chartMixins);
