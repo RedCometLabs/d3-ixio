@@ -437,7 +437,7 @@
         var cause = svg.selectAll(".cause")
         .data(data)
         .enter().append("g")
-        .attr("class", "cause")
+        .attr("class", function (d) { return "group-" + d.name + " cause";})
         .attr("transform", function(d) { return "translate(" + x0(d.name) + ",0)"; });
 
         // Add a rect for each column.
@@ -448,7 +448,7 @@
         //.attr("x", function(d) { return x0(d.x); })
         .attr("y", function(d) { return y(0); })
         .attr("height", function(d) { return height - y(0); })
-        .style("fill", function(d, i) { console.log(d); return color[d.name]; })
+        .style("fill", function(d, i) { return color[d.name]; })
         .attr("width", x0.rangeBand())
         .transition()
         .duration(800)
@@ -513,6 +513,22 @@
         .text(function(d) { return d; });*/
 
       });
+
+      chart.hightLight = function (selected) {
+        var svg = chart.svg;
+        
+        _.each(selected, function (s) {
+
+          console.log('se', s);
+          d3.select('.group-'+s).classed('highlighted', true);
+        });
+
+        d3.selectAll('.cause:not(.highlighted)')
+          .style("fill-opacity", 1)
+          .transition()
+          .duration(500)
+          .style("fill-opacity", 0.5);
+      },
 
       chart.remove = function () {
         var bars = chart.svg.selectAll(".cause"),

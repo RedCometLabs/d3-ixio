@@ -5776,6 +5776,10 @@ svg text,
 body {
   font-family: 'Ubuntu', sans-serif;
 }
+h1,
+p {
+  font-family: 'Ubuntu', sans-serif;
+}
 .col-lg-12 {
   padding-left: 0;
 }
@@ -5857,30 +5861,40 @@ a span {
   background-size: 100%;
   background: #000000 url(../img/crowd2.jpg) repeat-y center center;
 }
-#intro #intro-text {
+#intro #intro-text-container {
   display: inline-block;
   position: absolute;
   z-index: 10;
-  width: 52%;
-  top: 20px;
-  left: 72px;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+  padding: 15px;
+  background-color: rgba(0, 0, 0, 0.5);
   color: #fff;
 }
-#intro #intro-text h1 {
+#intro #intro-text-container #intro-text {
+  width: 80%;
+}
+#intro #intro-text-container #intro-text h1 {
   font-size: 115px;
 }
-#intro #intro-text p {
+#intro #intro-text-container #intro-text p {
   font-size: 30px;
   margin-top: 50px;
   font-family: verdana;
 }
+#intro-text-link,
+#text-link {
+  cursor: pointer;
+}
 #main-text {
-  font-size: 30px;
+  font-size: 25px;
   display: inline-block;
   position: absolute;
   z-index: 10;
-  width: 52%;
-  top: 20px;
+  width: 60%;
+  top: 10px;
   left: 72px;
   color: #333;
 }

@@ -2,7 +2,7 @@
   var charts = global.charts;
 
   var dataStructure = function (data, rows) {
-    data.allDocs = _.map(rows, function (row) { return row.doc; });
+    //data.allDocs = _.map(rows, function (row) { return row.doc; });
     /*data.clusterSizes = _.values(_.reduce(data.allDocs, function (info, doc) {
       var cg = doc.ClusterGroup;
       if (!info[cg]) {
@@ -701,7 +701,14 @@ return info;
       .call(groupedBarChart);
 
       this.currentChart = groupedBarChart;
-      this.setText('Hello, this is a long story of text that I am now writing','#graph2', true);
+      this.setText('The data is broken into 6 Cluster Groups. The Cluster Groups vary in size as well as number of <strong style="color:#A64260">Males</strong> to <strong style="color:#225B84">Females</strong>.','#graph2', false);
+    },
+
+    showGender2: function () {
+      if (!this.currentChart) { this.showGender(); }
+
+      this.currentChart.hightLight(["2", "7"]);
+      this.setText('Cluster Groups 2 is the largest Cluster and has the most equal ratio of males to females. Cluster Group 7 is the smallest and has the largest male ratio','#graph3', true);
     },
 
     showJoinYear: function () {
@@ -850,18 +857,24 @@ return info;
       $textArea = $('#main-text'),
       $link = $('#text-link');
       var fn = function () {
-        $text.text(text);
+        $text.html(text);
         $link.prop('href', link);
       };
 
       if (fadeIn) {
-        $textArea.hide('fast', function () {
-          fn();
-          $textArea.show('fast');
-        });
+        d3.select('#main-text')
+        .style("opacity", 1)
+        .transition()
+        .duration(500)
+        .style("opacity",  1e-6)
+        .each('end', fn)
+        .transition()
+        .duration(500)
+        .style("opacity", 1);
         return;
       }
 
+      $textArea.show('fast');
       fn();
     },
 
@@ -892,8 +905,9 @@ return info;
 
     routes: {
       "graph1":                 "graph1",
-      "graph2":                 "graph2",
-      "graph3":                 "graph3",
+      "graph2":                 "hightLightGender",
+      "graph3":                 "graph2",
+      //"graph3":                 "graph3",
       "graph4":                 "graph4",
       "graph5":                 "graph5",
       "(/)": "start"   
@@ -902,6 +916,10 @@ return info;
     graph1: function() {
       app.hideIntro();
       app.showGender();
+    },
+
+    hightLightGender: function () {
+      app.showGender2();
     },
 
     graph2: function() {
@@ -928,13 +946,10 @@ return info;
 
 
   $(function () {
-    var promise = $.getJSON('/ixio-challenge/_all_docs?include_docs=true&limit=10000');
-    promise.then(function (resp) {
-      dataStructure(data, resp.rows);
-      app.initialize(data);
-      router = new AppRouter();
-      Backbone.history.start();
-    });
+    dataStructure(data);
+    app.initialize(data);
+    router = new AppRouter();
+    Backbone.history.start();
   });
 
 
