@@ -433,19 +433,35 @@
         .attr("height", function(d) { console.log('d', d); return y(d.y0) - y(d.y1); })
         .attr("y", function(d) { return y(d.y1); });
 
-        cause.selectAll('text')
+        cause.selectAll('text.values')
         .data(function (d) {return d.points;})
         .enter()
         .append("text")
+        .attr('class', 'values')
         .style("fill-opacity", 1e-6)
         .transition()
         .duration(2500)
         .style("fill-opacity", 1)
-        .attr('x', x0.rangeBand()/2 - 7)
+        .attr('x', x0.rangeBand()/2)
         .attr("y", function (d) {return (y(d.y1) + y(d.y0))/2;})
         .attr("dy", ".35em")
         .style("text-anchor", "middle")
-        .text(function(d) { return d.value + " " + d.name + "(" + parseInt((d.value / d.size) * 100, 10) + "%)"; });
+        .text(function(d) { return "(" + parseInt((d.value / d.size) * 100, 10) + "%)"; });
+
+        cause.selectAll('text.gender')
+        .data(function (d) {return d.points;})
+        .enter()
+        .append("text")
+        .attr('class', 'gender')
+        .style("fill-opacity", 1e-6)
+        .transition()
+        .duration(2500)
+        .style("fill-opacity", 1)
+        .attr('x', x0.rangeBand()/2)
+        .attr("y", function (d) {return ((y(d.y1) + y(d.y0))/2) - 13;})
+        .attr("dy", ".35em")
+        .style("text-anchor", "middle")
+        .text(function(d) { return d.name + ": " + d.value;});
 
         svg.select('.x.axis')
         .attr("transform", "translate(0," + height + ")")
@@ -455,37 +471,37 @@
         .call(yAxis);
 
 
-        var legend = svg.selectAll(".legend")
+        /*var legend = svg.selectAll(".legend")
         .data(xGroups.reverse())
         .enter().append("g")
         .attr("class", "legend")
         .attr("transform", function(d, i) { return "translate(30," + i * 20 + ")"; });
 
         legend.append("rect")
-        .attr("x", width - 58)
+        .attr("x", width - 18)
         .attr("width", 18)
         .attr("height", 18)
         .style("fill", function (d) { return color[d];});
 
         legend.append("text")
-        .attr("x", width + 20)
+        .attr("x", width - 28)
         .attr("y", 9)
         .attr("dy", ".35em")
         .style("text-anchor", "end")
-        .text(function(d) { return d; });
+        .text(function(d) { return d; });*/
 
       });
 
       chart.remove = function () {
         var bars = chart.svg.selectAll(".cause"),
-        legend = chart.svg.selectAll(".legend");
+        axis = chart.svg.selectAll(".axis");
 
-        legend
+        axis
         .style("fill-opacity", 1)
         .transition()
-        .duration(1500)
+        .duration(1000)
         .style("fill-opacity", 1e-6)
-        .remove();
+        .remove()
 
         bars
         .style("fill-opacity", 1)

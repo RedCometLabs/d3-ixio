@@ -5779,6 +5779,12 @@ body {
 .col-lg-12 {
   padding-left: 0;
 }
+a span {
+  color: #fff;
+}
+#text-link span {
+  color: #000;
+}
 .axis path,
 .axis line {
   fill: none;
