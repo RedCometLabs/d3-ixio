@@ -262,7 +262,7 @@
         //var xGroups = ["1", "2", "3", "4", "5", "6", "7"],
         //    xColumns = ["unknown", "a", "b", "c", "d", "e", "f", "g", "h", "i"];
 
-        x0.rangeRoundBands([0, width], 0.4)
+        x0.rangeRoundBands([0, width], 0.2)
         .domain(xColumns);
 
         x1.domain(xGroups).rangeRoundBands([0, x0.rangeBand()]);
@@ -288,14 +288,21 @@
 
         svg.select('.x.axis')
         .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
+        .call(xAxis)
+        .append("text")
+        .style("font-size", "15px")
+        .attr("y", 20)
+        .attr('x', width/2)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text(chart.xTitle());
 
         svg.select('.y.axis')
         .call(yAxis)
         .append("text")
         .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
+        .attr("y", 8)
+        //.attr("dy", ".71em")
         .style("text-anchor", "end")
         .text(chart.yTitle());
 
@@ -332,6 +339,21 @@
         .exit()
         .remove();
 
+        income.selectAll('text.values')
+        .data(function (d) {console.log('d', d); return d.points;})
+        .enter()
+        .append("text")
+        .attr('class', 'values')
+        .style("fill-opacity", 1e-6)
+        .transition()
+        .duration(2500)
+        .style("fill-opacity", 1)
+        .attr('x', function (d) { return x1(d.name) + x1.rangeBand() /2;})
+        .attr("y", function (d) { return yScale(d.value) - 8; })
+        .attr("dy", ".35em")
+        .style("text-anchor", "middle")
+        .text(function(d) { return d.name.split('')[0];});
+
         var legend = g.selectAll(".legend")
         .data(xGroups.reverse())
         .enter().append("g")
@@ -339,16 +361,16 @@
         .attr("transform", function(d, i) { return "translate(30," + i * 20 + ")"; });
 
         legend.append("rect")
-        .attr("x", width - 58)
+        .attr("x", width - 78)
         .attr("width", 18)
         .attr("height", 18)
         .style("fill", color);
 
         legend.append("text")
-        .attr("x", width + 20)
+        .attr("x", width - 55)
         .attr("y", 9)
         .attr("dy", ".35em")
-        .style("text-anchor", "end")
+        .style("text-anchor", "start")
         .text(function(d) { return d; });
       });
     }
@@ -501,7 +523,7 @@
         .transition()
         .duration(1000)
         .style("fill-opacity", 1e-6)
-        .remove()
+        .remove();
 
         bars
         .style("fill-opacity", 1)
