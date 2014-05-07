@@ -652,7 +652,7 @@ return info;
       .call(groupedBarChart);
 
       this.currentChart = groupedBarChart;
-      this.setText('Hello, this is a long story of text that I am now writing', '#graph4', true);
+      this.setText('Hello, this is a long story of text that I am now writing', '#graph5', true);
     },
 
     showGender: function () {
@@ -745,7 +745,7 @@ return info;
       .call(lineGraph);
 
       this.currentChart = lineGraph;
-      this.setText('Hello, this is a long story of text that I am now writing','#graph5', true);
+      this.setText('Hello, this is a long story of text that I am now writing','#graph6', true);
 
     },
 
@@ -783,7 +783,7 @@ return info;
       .call(forceBubble);
 
       this.currentChart = forceBubble;
-      this.setText('Hello, this is a long story of text that I am now writing','#graph3', true);
+      this.setText('Hello, this is a long story of text that I am now writing','#graph1', true);
 
     },
 
@@ -792,7 +792,7 @@ return info;
 
       var radialData = _.map(data.clusterSizes, function (ic) {
         var axi = [];
-        _.each(['language', 'culturalProfile'], function (group) {
+        _.each(['culturalProfile', 'language'], function (group) {
           _.each(ic[group], function (val, key) {
             var axis = key;
             if (group === 'culturalProfile') {
@@ -807,7 +807,6 @@ return info;
         });
         return axi;
       });
-
 
       var radialGraph = charts.RadialGraph()
       .yScale(this.yScale)
@@ -828,7 +827,7 @@ return info;
       .call(radialGraph);
 
       this.currentChart = radialGraph;
-      this.setText('Hello, this is a long story of text that I am now writing','#graph3', true);
+      this.setText('There are four cultural profiles and 2 language groups. This radial graph explores spread of the language and culture profiles within the various Cluster Groups. <br/><small>(Hover over a Cluster Group colour on the graph to see its full profile )</small>','#graph4', true);
     },
 
     removeCurrentGraph: function () {
@@ -861,6 +860,8 @@ return info;
         $link.prop('href', link);
       };
 
+      $textArea.show();
+
       if (fadeIn) {
         d3.select('#main-text')
         .style("opacity", 1)
@@ -874,7 +875,6 @@ return info;
         return;
       }
 
-      $textArea.show('fast');
       fn();
     },
 
@@ -904,16 +904,16 @@ return info;
   var AppRouter = Backbone.Router.extend({
 
     routes: {
-      "graph1":                 "graph1",
+      "graph1":                 "showGender",
       "graph2":                 "hightLightGender",
-      "graph3":                 "graph2",
-      //"graph3":                 "graph3",
-      "graph4":                 "graph4",
-      "graph5":                 "graph5",
+      "graph3":                 "showRadial",
+      "graph4":                 "showIncome",
+      "graph5":                 "showJoinYear",
+      "graph6":                 "showProduct",
       "(/)": "start"   
     },
 
-    graph1: function() {
+    showGender: function() {
       app.hideIntro();
       app.showGender();
     },
@@ -922,19 +922,19 @@ return info;
       app.showGender2();
     },
 
-    graph2: function() {
+    showRadial: function() {
       app.showRadialInfo();
     },
 
-    graph3: function() {
+    showIncome: function() {
       app.showIncomeClusterGroups();
     },
 
-    graph4: function() {
+    showJoinYear: function() {
       app.showJoinYear();
     },
 
-    graph5: function() {
+    showProduct: function() {
       app.showProduct();
     },
 

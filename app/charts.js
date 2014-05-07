@@ -709,8 +709,8 @@
         xColumns = chart.xColumns(),
         cfg = {
           radius: 5,
-          w: chart.width() - margin.left - margin.right,
-          h: chart.height() -30- margin.top - margin.bottom,
+          w: chart.width() - chart.width()/4 - margin.left - margin.right,
+          h: chart.height() - chart.height()/4 - margin.top - margin.bottom,
           factor: 1,
           factorLegend: 0.85,
           levels: 3,
@@ -749,25 +749,27 @@
         //Circular segments
         for(j=0; j<cfg.levels-1; j++){
           levelFactor = cfg.factor*radius*((j+1)/cfg.levels);
+          console.log('le', levelFactor, (cfg.w/2-levelFactor));
           g.selectAll(".levels")
           .data(allAxis)
           .enter()
           .append("svg:line")
-          .attr("x1", function(d, i){return levelFactor*(1-cfg.factor*Math.sin(i*cfg.radians/total));})
-          .attr("y1", function(d, i){return levelFactor*(1-cfg.factor*Math.cos(i*cfg.radians/total));})
-          .attr("x2", function(d, i){return levelFactor*(1-cfg.factor*Math.sin((i+1)*cfg.radians/total));})
-          .attr("y2", function(d, i){return levelFactor*(1-cfg.factor*Math.cos((i+1)*cfg.radians/total));})
           .attr("class", "line")
           .style("stroke", "grey")
           .style("stroke-opacity", "0.75")
           .style("stroke-width", "0.3px")
-          .attr("transform", "translate(" + (cfg.w/2-levelFactor) + ", " + (cfg.h/2-levelFactor) + ")");
+          .attr("transform", "translate(" + (cfg.w/2-levelFactor) + ", " + (cfg.h/2-levelFactor) + ")")
+          .attr("x1", function(d, i){return levelFactor*(1-cfg.factor*Math.sin(i*cfg.radians/total));})
+          .attr("y1", function(d, i){return levelFactor*(1-cfg.factor*Math.cos(i*cfg.radians/total));})
+          .attr("x2", function(d, i){return levelFactor*(1-cfg.factor*Math.sin((i+1)*cfg.radians/total));})
+          .attr("y2", function(d, i){return levelFactor*(1-cfg.factor*Math.cos((i+1)*cfg.radians/total));});
         }
 
         var series;
         //Text indicating at what % each level is
         for(j=0; j<cfg.levels; j++){
           levelFactor = cfg.factor*radius*((j+1)/cfg.levels);
+          console.log('le2', levelFactor);
           g.selectAll(".levels")
           .data([1]) //dummy data
           .enter()
@@ -829,13 +831,6 @@
           .attr("class", "radar-chart-serie"+series)
           .style("stroke-width", "2px")
           .style("stroke", cfg.color(series))
-          .attr("points",function(d) {
-            var str="";
-            for(var pti=0;pti<d.length;pti++){
-              str=str+d[pti][0]+","+d[pti][1]+" ";
-            }
-            return str;
-          })
           .style("fill", function(j, i){return cfg.color(series);})
           .style("fill-opacity", cfg.opacityArea)
           .on('mouseover', function (d){
@@ -851,6 +846,16 @@
             g.selectAll("polygon")
             .transition(200)
             .style("fill-opacity", cfg.opacityArea);
+          })
+          .attr('points', function (d) { return cfg.w/2 + "," + cfg.h/2 + ' ' + cfg.w/2 + "," + cfg.h/2 + ' ' + cfg.w/2 + "," + cfg.h/2 + ' ' + cfg.w/2 + "," + cfg.h/2 + ' ' + cfg.w/2 + "," + cfg.h/2 + ' ' + cfg.w/2 + "," + cfg.h/2 + ' ' + cfg.w/2 + "," + cfg.h/2;})
+          .transition()
+          .duration(2000)
+          .attr("points",function(d) {
+            var str="";
+            for(var pti=0;pti<d.length;pti++){
+              str=str+d[pti][0]+","+d[pti][1]+" ";
+            }
+            return str;
           });
           series++;
         });
@@ -858,22 +863,14 @@
 
 
         d.forEach(function(y, x){
-          g.selectAll(".nodes")
+          var enteredNode = g.selectAll(".nodes")
           .data(y).enter()
           .append("svg:circle")
           .attr("class", "radar-chart-serie"+series)
+          .attr('cy', cfg.h/2)
+          .attr('cx', cfg.w/2)
           .attr('r', cfg.radius)
           .attr("alt", function(j){return Math.max(j.value, 0);})
-          .attr("cx", function(j, i){
-            dataValues.push([
-              cfg.w/2*(1-(parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor*Math.sin(i*cfg.radians/total)), 
-              cfg.h/2*(1-(parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor*Math.cos(i*cfg.radians/total))
-            ]);
-            return cfg.w/2*(1-(Math.max(j.value, 0)/cfg.maxValue)*cfg.factor*Math.sin(i*cfg.radians/total));
-          })
-          .attr("cy", function(j, i){
-            return cfg.h/2*(1-(Math.max(j.value, 0)/cfg.maxValue)*cfg.factor*Math.cos(i*cfg.radians/total));
-          })
           .attr("data-id", function(j){return j.axis;})
           .style("fill", cfg.color(series)).style("fill-opacity", 0.9)
           .on('mouseover', function (d){
@@ -902,7 +899,23 @@
             g.selectAll("polygon")
             .transition(200)
             .style("fill-opacity", cfg.opacityArea);
+          });
+
+          enteredNode
+          .transition()
+          .duration(2000)
+          .attr("cx", function(j, i){
+            dataValues.push([
+              cfg.w/2*(1-(parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor*Math.sin(i*cfg.radians/total)), 
+              cfg.h/2*(1-(parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor*Math.cos(i*cfg.radians/total))
+            ]);
+            return cfg.w/2*(1-(Math.max(j.value, 0)/cfg.maxValue)*cfg.factor*Math.sin(i*cfg.radians/total));
           })
+          .attr("cy", function(j, i){
+            return cfg.h/2*(1-(Math.max(j.value, 0)/cfg.maxValue)*cfg.factor*Math.cos(i*cfg.radians/total));
+          });
+
+          enteredNode
           .append("svg:title")
           .text(function(j){return Math.max(j.value, 0);});
 
@@ -917,23 +930,16 @@
 
         chart.createLegend(xColumns, g);
 
-        /*g.style("fill-opacity", 1e-6)
-          .transition()
-          .duration(1000)
-          .style('fill-opacity', 1);*/
-
-
-        g.attr("transform", "translate(-800, -800)")
+        /*g.attr("transform", "translate(-800, -800)")
         .transition()
         .ease("cubic-out")
         .duration(1000)
-        .attr("transform", "translate(" + cfg.TranslateX + "," + cfg.TranslateY + ")");
+        .attr("transform", "translate(" + cfg.TranslateX + "," + cfg.TranslateY + ")");*/
       });
 
     }
 
     chart.createLegend = function (legendOptions, mainSvg) {
-      console.log(legendOptions);
       var margin = chart.margin(),
       w = chart.width() - margin.left - margin.right,
       h = chart.height() - margin.top - margin.bottom,
@@ -949,7 +955,7 @@
       .attr("class", "legend")
       .attr("height", 100)
       .attr("width", 200)
-      .attr('transform', 'translate(-100,0)') 
+      .attr('transform', 'translate(-150,0)') 
       ;
       //Create colour squares
       legend.selectAll('rect')
@@ -957,9 +963,9 @@
       .enter()
       .append("rect")
       .attr("x", w - 70)
-      .attr("y", function(d, i){ return i * 20;})
-      .attr("width", 15)
-      .attr("height", 15)
+      .attr("y", function(d, i){ return i * 24;})
+      .attr("width", 18)
+      .attr("height", 18)
       .style("fill", function(d, i){ return colorscale(i);})
       .attr('class', function (d, i) { return 'radar-chart-serie' + i;});
 
@@ -968,9 +974,9 @@
       .data(legendOptions)
       .enter()
       .append("text")
-      .attr("x", w - 52)
-      .attr("y", function(d, i){ return i * 20 + 12;})
-      .attr("font-size", "12px")
+      .attr("x", w - 50)
+      .attr("y", function(d, i){ return i * 24 + 14;})
+      .attr("font-size", "14px")
       .attr("fill", "#666")
       .text(function(d) { return d; })
       ;	

@@ -5898,3 +5898,7 @@ a span {
   left: 72px;
   color: #333;
 }
+#main-text small {
+  font-size: 11px;
+  float: right;
+}
