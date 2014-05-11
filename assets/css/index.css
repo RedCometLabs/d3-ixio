@@ -5902,3 +5902,6 @@ a span {
   font-size: 11px;
   float: right;
 }
+.legend {
+  cursor: pointer;
+}

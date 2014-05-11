@@ -280,9 +280,12 @@
         var svg = d3.select(this),
         g = svg.append('g').attr('class', 'grouped');
 
-
         chart.svg = g;
+        svg.append("g")
+          .attr("class", "x axis");
 
+        svg.append("g")
+          .attr("class", "y axis");
 
         svg.call(tip);
 
@@ -322,7 +325,7 @@
         incomeBars
         .enter()
         .append("rect")
-        .attr("class", "group-bar")
+        .attr("class", function (d) { return "group-bar income-" + d.name;})
         .attr("width", x1.rangeBand())
         .attr("x", function(d) { return x1(d.name); })
         .attr("y", function(d) { return yScale(0); })
@@ -339,11 +342,13 @@
         .exit()
         .remove();
 
-        income.selectAll('text.values')
-        .data(function (d) {console.log('d', d); return d.points;})
+        var textValues = income.selectAll('text.values')
+        .data(function (d) {console.log('d', d); return d.points;});
+
+        textValues
         .enter()
         .append("text")
-        .attr('class', 'values')
+        .attr('class', function (d) { return 'values income-values-' +d.name;})
         .style("fill-opacity", 1e-6)
         .transition()
         .duration(2500)
@@ -358,20 +363,60 @@
         .data(xGroups.reverse())
         .enter().append("g")
         .attr("class", "legend")
-        .attr("transform", function(d, i) { return "translate(30," + i * 20 + ")"; });
+        .attr("transform", function(d, i) { return "translate(30," + i * 28 + ")"; });
 
-        legend.append("rect")
+        var legendRect = legend.append("rect")
         .attr("x", width - 78)
-        .attr("width", 18)
-        .attr("height", 18)
+        .attr("width", 65)
+        .attr("height", 25)
+        .attr("rx", 5)
+        .attr("r7", 5)
+        .attr('class', 'rect-button')
         .style("fill", color);
 
         legend.append("text")
-        .attr("x", width - 55)
-        .attr("y", 9)
+        .attr("x", width - 45)
+        .attr("y", 11)
         .attr("dy", ".35em")
-        .style("text-anchor", "start")
+        .style("text-anchor", "middle")
         .text(function(d) { return d; });
+
+        var last = null;
+        legend.on("click", function (name) {
+          
+          console.log(arguments);
+          incomeBars
+          .transition()
+          .duration(1000)
+          .attr("y", function(d) { return yScale(d.value); })
+          .attr("height", function(d) { return height - yScale(d.value); });
+
+          textValues
+          .transition()
+          .duration(1000)
+          .attr("y", function (d) { return yScale(d.value) - 8; })
+          .style("fill-opacity", 1);
+          
+          if (last !== name) {
+          d3.selectAll('.values:not(.income-values-' + name + ')')
+            .transition()
+            .duration(1000)
+            .attr("y", function(d) { return yScale(0); })
+            .style("fill-opacity", 1e-6);
+
+            d3.selectAll('.group-bar:not(.income-' + name + ')')
+            .transition()
+            .duration(1000)
+            .attr("y", function(d) { return yScale(0); })
+            .attr("height", function(d) { return height - yScale(0); });
+
+            last = name;
+          } else {
+            last = null;
+          }
+
+
+        });
       });
     }
 
@@ -584,12 +629,15 @@
         svg = d3.select(this);
 
         chart.svg = svg;
+        chart.xScale = xScale;
+        chart.yScale = yScale;
+        chart.xAxis = xAxis;
+        chart.yAxis = yAxis;
 
         var allPoints = _.reduce(data, function (all, d) {
           return all.concat(_.map(d.points, function (p) { return p.value;}));
         }, []);
 
-        console.log('xco', xColumns);
         xScale
         .domain(xColumns)
         .rangeRoundBands([0, width + margin.left]);
@@ -628,6 +676,36 @@
         .append("path")
         .attr('class', 'line')
         .style('stroke', function (d, i) { return color(i);});
+
+        chart.zoom = function () {
+          function zoomed() {
+            console.log('zoomhd');
+            svg.select(".x.axis").call(xAxis);
+            svg.select(".y.axis").call(yAxis);
+          }
+
+          xScale.domain(_.map(_.range(2007, 2014), function (d) { return d.toString();}));
+          svg.select(".x.axis")
+          .transition()
+          .duration(1000)
+          .call(xAxis);
+
+            var lines = lineGroup.selectAll(".line")
+            .data(function (d) { var out = [_.filter(d.points, function (p) { return p.date >= "2007";})]; console.log(out); return out;});
+
+            lines
+            .transition()
+            .duration(1000)
+            .attr("d", line);
+
+
+//          lineGroup.transition()
+ //         .duration(1000)
+          //.attr("transform", "translate(" + -xScale('2007')  + ',' + -100 + ")scale(" + 1.5 + ")")
+          //.each('end',zoomed);
+
+        };
+
 
         function tick () {
           // Add a rect for each column.
@@ -693,7 +771,10 @@
         .remove();
 
       };
-    }
+
+          }
+
+    window.setTimeout(function () { chart.zoom(); }, 5000);
 
     _.extend(chart, chartMixins);
 
