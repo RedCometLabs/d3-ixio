@@ -733,7 +733,7 @@ return info;
           points: _.map(ic.joinYear, function (val, key) { 
             return {
               value: val,
-              date: key
+              date: parseInt(key, 10)
             };
           })
         };
@@ -747,6 +747,14 @@ return info;
       this.currentChart = lineGraph;
       this.setText('Hello, this is a long story of text that I am now writing','#graph6', true);
 
+    },
+
+    showJoinYear2: function () {
+      if (!this.currentChart) { this.showJoinYear2(); }
+
+      console.log('zom');
+      this.currentChart.zoom();
+      this.setText('Hello, this is a long story of text that I am now writing','#graph7', true);
     },
 
     showProduct: function () {
@@ -909,7 +917,8 @@ return info;
       "graph3":                 "showRadial",
       "graph4":                 "showIncome",
       "graph5":                 "showJoinYear",
-      "graph6":                 "showProduct",
+      "graph6":                 "showJoinYear2",
+      "graph7":                 "showProduct",
       "(/)": "start"   
     },
 
@@ -932,6 +941,10 @@ return info;
 
     showJoinYear: function() {
       app.showJoinYear();
+    },
+
+    showJoinYear2: function() {
+      app.showJoinYear2();
     },
 
     showProduct: function() {
