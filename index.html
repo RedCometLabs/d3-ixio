@@ -43,22 +43,31 @@ body {
         <div id="intro" style="display: none">
           <div id="intro-text-container">
             <div id="intro-text">
-            <h1> Exploring Ixio data </1>
-              <p> Ixio has set a challenge to explore a given set of anonymized demographic data. <br> Click the arrow to begin that exploration.
-            <a id="intro-text-link" href="#graph1"> <span class="glyphicon glyphicon-arrow-right"> </span></a>
-            </p>
+              <h1> Exploring Ixio data </1>
+                <p> Ixio has set a challenge to explore a given set of anonymized demographic data. <br> Click the arrow to begin that exploration.
+                <a id="intro-text-link" href="#graph1"> <span class="glyphicon glyphicon-arrow-right"> </span></a>
+                </p>
+              </div>
+            </div>
           </div>
-          </div>
-        </div>
 
-        <div id="main-text" style="display:none">
-          <span id="main-text-span"> </span> <a id="text-link" href="#graph1"> <span class="glyphicon glyphicon-arrow-right"> </span></a>
+          <div class="row-fluid" id="main-text" style="display:none" >
+            <div id="main-text-span" class="col-lg-8">
+            </div>
+            <div class="col-lg-1">
+              <a id="text-link" href="#graph1"> <span class="glyphicon glyphicon-arrow-right"> </span></a>
+            </div>
+          </div>
+          <div id="chart-area">
+            <div id="bubble-selection" style:"display:none" class="btn-group">
+              <button id="btn-cluster-group" type="button" class="btn active select-btn-group btn-primary">Group by ClusterGroup</button>
+              <button id="btn-product" type="button" class="btn select-btn-group btn-success">Group by Product</button>
+            </div>          
+          </div>
         </div>
-        <div id="chart-area"> </div>
       </div>
     </div>
   </div>
-</div>
 </div>
 
 <!-- Application source. -->

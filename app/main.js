@@ -7,76 +7,76 @@
       var cg = doc.ClusterGroup;
       if (!info[cg]) {
       info[cg] = {
-clusterGroup: cg,
-name: cg,
-size: 0,
-male: 0,
-female: 0,
-income: {
-unknown: 0,
-a: 0,
-b: 0,
-c: 0,
-d: 0,
-e: 0,
-f: 0,
-g: 0,
-h: 0,
-i: 0
-},
-language: {
-"English": 0,
-"Afrikaans": 0
-},
-culturalProfile: {
-"1": 0,
-"2": 0,
-"3": 0,
-"4": 0
-},
+      clusterGroup: cg,
+      name: cg,
+      size: 0,
+      male: 0,
+      female: 0,
+      income: {
+      unknown: 0,
+      a: 0,
+      b: 0,
+      c: 0,
+      d: 0,
+      e: 0,
+      f: 0,
+      g: 0,
+      h: 0,
+      i: 0
+      },
+      language: {
+      "English": 0,
+      "Afrikaans": 0
+      },
+      culturalProfile: {
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0
+      },
 
-favouredProduct: {
-"Null": 0,
-"Product1":0,
-"Product2":0,
-"Product3":0,
-"Product4":0,
-"Product5":0,
-"Product6":0,
-"Product7":0,
-"Product8":0,
-"Product9":0,
-"Product10":0
-}
-};
+      favouredProduct: {
+      "Null": 0,
+      "Product1":0,
+      "Product2":0,
+      "Product3":0,
+      "Product4":0,
+      "Product5":0,
+      "Product6":0,
+      "Product7":0,
+      "Product8":0,
+      "Product9":0,
+      "Product10":0
+      }
+      };
 
-info[cg].joinYear = _.reduce(_.range(1985, 2014), function (group, year) {
-group[year.toString()] = 0;
-return group;
-}, {});
-}
+      info[cg].joinYear = _.reduce(_.range(1985, 2014), function (group, year) {
+      group[year.toString()] = 0;
+      return group;
+      }, {});
+      }
 
-var group = info[cg];
+      var group = info[cg];
 
-group.size += 1;
-var income = doc.income === "" ? "unknown" : doc.income.toLowerCase() ;
-group.income[income] += 1;
-group.joinYear[doc.joinYear] +=  1;
-group.language[doc.language] += 1;
-group.culturalProfile[doc.culturalProfile] += 1;
-group.favouredProduct[doc.favouredProduct] += 1;
+      group.size += 1;
+      var income = doc.income === "" ? "unknown" : doc.income.toLowerCase() ;
+      group.income[income] += 1;
+      group.joinYear[doc.joinYear] +=  1;
+      group.language[doc.language] += 1;
+      group.culturalProfile[doc.culturalProfile] += 1;
+      group.favouredProduct[doc.favouredProduct] += 1;
 
-if (doc.gender === "Female") {
-group.female = group.female + 1;
-} else {
-group.male = group.male + 1;
-}
+      if (doc.gender === "Female") {
+      group.female = group.female + 1;
+      } else {
+      group.male = group.male + 1;
+      }
 
-return info;
-}, {}));*/
+      return info;
+      }, {}));*/
 
     data.clusterSizes = [
-      {
+    {
       "clusterGroup": "1",
       "name": "1",
       "size": 4620,
@@ -520,7 +520,7 @@ return info;
       _.each(cs.income, function (val, key) {
         var item = {
           value: (val / cs.size) * 100,
-          name: cs.clusterGroup
+        name: cs.clusterGroup
         };
 
         group[key].points.push(item);
@@ -530,11 +530,11 @@ return info;
     }, {
       unknown: {
         name: 'unknown',
-        points: []
+      points: []
       },
       a: {
         name: 'a',
-        points: []
+      points: []
       },
       b: {
         name: 'b',
@@ -589,49 +589,49 @@ return info;
       this.yScale = d3.scale.linear().range([this.height(), 0]);
 
       this.xAxis = d3.svg.axis()
-      .scale(this.xScale)
-      .orient("bottom");
+        .scale(this.xScale)
+        .orient("bottom");
 
       this.yAxis = d3.svg.axis()
-      .scale(this.yScale)
-      .orient("left");
+        .scale(this.yScale)
+        .orient("left");
 
       this.svg = d3.select(this.el)
-      .append("svg")
-      .append("g")
-      .attr('class', 'svg-chart-area')
-      .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+        .append("svg")
+        .append("g")
+        .attr('class', 'svg-chart-area')
+        .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
 
       this.svg.append("g")
-      .attr("class", "x axis");
+        .attr("class", "x axis");
       //.attr("transform", "translate(0," + this.height() + ")")
       //.call(this.xAxis);
 
       this.svg.append("g")
-      .attr("class", "y axis");
+        .attr("class", "y axis");
       //.call(this.yAxis);
 
       var div = d3.select("body").append("div")   
-      .attr("class", "tooltip")               
-      .style("opacity", 0);
+        .attr("class", "tooltip")               
+        .style("opacity", 0);
 
     },
 
     showIncomeClusterGroups: function () {
       this.removeCurrentGraph();
       var groupedBarChart = charts.GroupedBarChart()
-      .yScale(this.yScale)
-      .xScale(this.xScale)
-      .yAxis(this.yAxis)
-      .xAxis(this.xAxis)
-      .xColumns(["1", "2", "4", "5", "6", "7"])
-      .xGroups(["unknown", "a", "b", "c", "d", "e", "f", "g", "h", "i"])
-      .margin(this.margin)
-      .width(this.windowWidth() - 100)
-      .height(this.windowHeight())
-      .yTitle('Percentage')
-      .xTitle('Cluster Groups');
+        .yScale(this.yScale)
+        .xScale(this.xScale)
+        .yAxis(this.yAxis)
+        .xAxis(this.xAxis)
+        .xColumns(["1", "2", "4", "5", "6", "7"])
+        .xGroups(["unknown", "a", "b", "c", "d", "e", "f", "g", "h", "i"])
+        .margin(this.margin)
+        .width(this.windowWidth() - 100)
+        .height(this.windowHeight())
+        .yTitle('Percentage')
+        .xTitle('Cluster Groups');
 
       var barData = _.map(data.clusterSizes, function (ic) {
         var incomes = _.map(ic.income, function (val, key) {
@@ -648,8 +648,8 @@ return info;
       });
 
       d3.select(".svg-chart-area")
-      .datum(barData)
-      .call(groupedBarChart);
+        .datum(barData)
+        .call(groupedBarChart);
 
       this.currentChart = groupedBarChart;
       this.setText('Hello, this is a long story of text that I am now writing', '#graph5', true);
@@ -658,17 +658,17 @@ return info;
     showGender: function () {
       this.removeCurrentGraph();
       var groupedBarChart = charts.StackedBar()
-      .yScale(this.yScale)
-      .xScale(this.xScale)
-      .yAxis(this.yAxis)
-      .xAxis(this.xAxis)
-      .margin(this.margin)
-      .width(this.windowWidth() - 100)
-      .height(this.windowHeight())
-      .xColumns(["1", "2", "4", "5", "6", "7"])
-      .xGroups(["Male", "Female"])
-      .yTitle('Percentage')
-      .xTitle('Cluster Groups');
+        .yScale(this.yScale)
+        .xScale(this.xScale)
+        .yAxis(this.yAxis)
+        .xAxis(this.xAxis)
+        .margin(this.margin)
+        .width(this.windowWidth() - 100)
+        .height(this.windowHeight())
+        .xColumns(["1", "2", "4", "5", "6", "7"])
+        .xGroups(["Male", "Female"])
+        .yTitle('Percentage')
+        .xTitle('Cluster Groups');
 
       var barData = _.map(data.clusterSizes, function (ic) {
         var y0 = 0;
@@ -676,29 +676,29 @@ return info;
           name: ic.clusterGroup,
           size: ic.size,
           points: [
-            {
-            name: "Male",
-            value: ic.male,
-            size: ic.size,
-            y0: y0,
-            y1: y0 += ic.male 
-          },
+      {
+        name: "Male",
+          value: ic.male,
+          size: ic.size,
+          y0: y0,
+          y1: y0 += ic.male 
+      },
           {
             name: "Female",
-            value: ic.female,
-            size: ic.size,
-            y0: y0,
-            y1: y0 += ic.female
+          value: ic.female,
+          size: ic.size,
+          y0: y0,
+          y1: y0 += ic.female
           }
-          ]
+      ]
         };
       });
 
 
       console.log(barData);
       d3.select(".svg-chart-area")
-      .datum(barData)
-      .call(groupedBarChart);
+        .datum(barData)
+        .call(groupedBarChart);
 
       this.currentChart = groupedBarChart;
       this.setText('The data is broken into 6 Cluster Groups. The Cluster Groups vary in size as well as number of <strong style="color:#A64260">Males</strong> to <strong style="color:#225B84">Females</strong>.','#graph2', false);
@@ -715,17 +715,17 @@ return info;
       this.removeCurrentGraph();
 
       var lineGraph = charts.LineGraph()
-      .yScale(this.yScale)
-      .xScale(this.xScale)
-      .yAxis(this.yAxis)
-      .xAxis(this.xAxis)
-      .margin(this.margin)
-      .width(this.windowWidth() - 100)
-      .height(this.windowHeight())
-      .xColumns(_.map(_.range(1985, 2014), function (d) { return d;}))
-      //.xGroups(["Male", "Female"])
-      .yTitle('Number of people joined')
-      .xTitle('Year');
+        .yScale(this.yScale)
+        .xScale(this.xScale)
+        .yAxis(this.yAxis)
+        .xAxis(this.xAxis)
+        .margin(this.margin)
+        .width(this.windowWidth() - 100)
+        .height(this.windowHeight())
+        .xColumns(_.map(_.range(1985, 2014), function (d) { return d;}))
+        //.xGroups(["Male", "Female"])
+        .yTitle('Number of people joined')
+        .xTitle('Year');
 
       var lineData = _.map(data.clusterSizes, function (ic) {
         return {
@@ -733,7 +733,7 @@ return info;
           points: _.map(ic.joinYear, function (val, key) { 
             return {
               value: val,
-              date: parseInt(key, 10)
+          date: parseInt(key, 10)
             };
           })
         };
@@ -741,8 +741,8 @@ return info;
 
       console.log(lineData);
       d3.select(".svg-chart-area")
-      .datum(lineData)
-      .call(lineGraph);
+        .datum(lineData)
+        .call(lineGraph);
 
       this.currentChart = lineGraph;
       this.setText('Hello, this is a long story of text that I am now writing','#graph6', true);
@@ -761,17 +761,17 @@ return info;
       this.removeCurrentGraph();
 
       var forceBubble = charts.ForceBubble()
-      .yScale(this.yScale)
-      .xScale(this.xScale)
-      .yAxis(this.yAxis)
-      .xAxis(this.xAxis)
-      .margin(this.margin)
-      .width(this.windowWidth() - 100)
-      .height(this.windowHeight())
-      .xColumns(["1", "2", "4", "5", "6", "7"])
-      //.xGroups(["Male", "Female"])
-      .yTitle('Number of people joined')
-      .xTitle('Year');
+        .yScale(this.yScale)
+        .xScale(this.xScale)
+        .yAxis(this.yAxis)
+        .xAxis(this.xAxis)
+        .margin(this.margin)
+        .width(this.windowWidth() - 100)
+        .height(this.windowHeight())
+        .xColumns(["1", "2", "4", "5", "6", "7"])
+        //.xGroups(["Male", "Female"])
+        .yTitle('Number of people joined')
+        .xTitle('Year');
 
       var forceData = _.map(data.clusterSizes, function (ic) {
         return {
@@ -779,7 +779,7 @@ return info;
           nodes: _.map(ic.favouredProduct, function (val, key) {
             return {
               value: parseInt((val / ic.size) * 100, 10),
-              name: key
+          name: key
             };
           })
         };
@@ -787,8 +787,8 @@ return info;
 
       console.log(forceData);
       d3.select(".svg-chart-area")
-      .datum(forceData)
-      .call(forceBubble);
+        .datum(forceData)
+        .call(forceBubble);
 
       this.currentChart = forceBubble;
       this.setText('Hello, this is a long story of text that I am now writing','#graph1', true);
@@ -817,22 +817,22 @@ return info;
       });
 
       var radialGraph = charts.RadialGraph()
-      .yScale(this.yScale)
-      .xScale(this.xScale)
-      .yAxis(this.yAxis)
-      .xAxis(this.xAxis)
-      .margin(this.margin)
-      .width(this.windowWidth() - 100)
-      .height(this.windowHeight())
-      .xColumns(_.map(data.clusterSizes, function (d) { return 'Cluster Group ' + d.clusterGroup;}))
-      //.xGroups(["Male", "Female"])
-      .yTitle('Number of people joined')
-      .xTitle('Year');
+        .yScale(this.yScale)
+        .xScale(this.xScale)
+        .yAxis(this.yAxis)
+        .xAxis(this.xAxis)
+        .margin(this.margin)
+        .width(this.windowWidth() - 100)
+        .height(this.windowHeight())
+        .xColumns(_.map(data.clusterSizes, function (d) { return 'Cluster Group ' + d.clusterGroup;}))
+        //.xGroups(["Male", "Female"])
+        .yTitle('Number of people joined')
+        .xTitle('Year');
 
       console.log(radialData);
       d3.select(".svg-chart-area")
-      .datum(radialData)
-      .call(radialGraph);
+        .datum(radialData)
+        .call(radialGraph);
 
       this.currentChart = radialGraph;
       this.setText('There are four cultural profiles and 2 language groups. This radial graph explores spread of the language and culture profiles within the various Cluster Groups. <br/><small>(Hover over a Cluster Group colour on the graph to see its full profile )</small>','#graph4', true);
@@ -872,14 +872,14 @@ return info;
 
       if (fadeIn) {
         d3.select('#main-text')
-        .style("opacity", 1)
-        .transition()
-        .duration(500)
-        .style("opacity",  1e-6)
-        .each('end', fn)
-        .transition()
-        .duration(500)
-        .style("opacity", 1);
+          .style("opacity", 1)
+          .transition()
+          .duration(500)
+          .style("opacity",  1e-6)
+          .each('end', fn)
+          .transition()
+          .duration(500)
+          .style("opacity", 1);
         return;
       }
 
@@ -896,9 +896,9 @@ return info;
 
     displayIntro: function () {
       $('#intro')
-      .width(this.windowWidth())
-      .height(this.windowHeight())
-      .show();
+        .width(this.windowWidth())
+        .height(this.windowHeight())
+        .show();
     },
 
     hideIntro: function () {
@@ -922,38 +922,38 @@ return info;
       "(/)": "start"   
     },
 
-    showGender: function() {
-      app.hideIntro();
-      app.showGender();
-    },
+      showGender: function() {
+        app.hideIntro();
+        app.showGender();
+      },
 
-    hightLightGender: function () {
-      app.showGender2();
-    },
+      hightLightGender: function () {
+        app.showGender2();
+      },
 
-    showRadial: function() {
-      app.showRadialInfo();
-    },
+      showRadial: function() {
+        app.showRadialInfo();
+      },
 
-    showIncome: function() {
-      app.showIncomeClusterGroups();
-    },
+      showIncome: function() {
+        app.showIncomeClusterGroups();
+      },
 
-    showJoinYear: function() {
-      app.showJoinYear();
-    },
+      showJoinYear: function() {
+        app.showJoinYear();
+      },
 
-    showJoinYear2: function() {
-      app.showJoinYear2();
-    },
+      showJoinYear2: function() {
+        app.showJoinYear2();
+      },
 
-    showProduct: function() {
-      app.showProduct();
-    },
+      showProduct: function() {
+        app.showProduct();
+      },
 
-    start: function(query, page) {
-      app.displayIntro();
-    }
+      start: function(query, page) {
+        app.displayIntro();
+      }
 
   });
 
