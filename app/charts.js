@@ -690,11 +690,17 @@ charts.LineGraph = function () {
       .attr('class', 'line')
       .style('stroke', function (d, i) { return color(d.name);});
 
-    var legend = svg.selectAll(".legend")
+    var legend = svg.selectAll(".legend-linegraph")
       .data(groups.reverse())
       .enter().append("g")
-      .attr("class", "legend")
+      .attr("class", "legend-linegraph")
       .attr("transform", function(d, i) { console.log('d', i); return "translate(" + (width - 70 - i * 70)  + "," + -25 + ")"; });
+
+    legend
+      .style("fill-opacity", 1e-6)
+      .transition()
+      .duration(2000)
+      .style("fill-opacity", 1);
 
     var legendRect = legend.append("rect")
       //.attr("y", 0)
@@ -819,7 +825,7 @@ charts.LineGraph = function () {
     });
 
     chart.remove = function () {
-      var cause = chart.svg.selectAll(".line-group, .legend, .axis");
+      var cause = chart.svg.selectAll(".line-group, .legend-linegraph, .axis");
 
       cause
         .style("fill-opacity", 1)

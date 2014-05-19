@@ -56,13 +56,6 @@ module.exports = function (grunt) {
       },
     },
 
-    concat: {
-      all: {
-        src: ["src/utils.js", "src/base.js", "src/api.js", "src/auth.js", "src/couchdbSession.js", "src/layout.js", "src/routeObject.js", "src/router.js"],
-        dest: "release/kubu.js"
-      }
-    },
-
     less:{
       development: {
         options: {
@@ -89,9 +82,43 @@ module.exports = function (grunt) {
             changeOrigin: true
           }
          }
-     }
+     },
 
+     shell: {
+        deployLocal: {
+            command: './node_modules/couchapp/bin.js push couchapp.js ' + process.env.COUCHDB + '/babylist',
+            options: {                      // Options
+                stdout: true
+            }
+        },
 
+        deployCloudant: {
+            command: './node_modules/couchapp/bin.js push couchapp.js '+ process.env.CLOUDANT +'/babylist',
+            options: {                      // Options
+                stdout: true
+            }
+
+        }
+     },
+
+    concat: {
+      options: {
+        separator: ';',
+      },
+      dist: {
+        src: [
+          'assets/js/libs/d3.js',
+          'assets/js/libs/d3.tip.js',
+          'assets/js/libs/jquery.js',
+          'assets/js/libs/lodash.js',
+          'assets/js/libs/backbone.js',
+
+          'app/charts.js',
+          'app/main.js'
+          ],
+        dest: 'dist/app.js',
+      },
+    }
 
   });
 
@@ -101,14 +128,16 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-less');
+  grunt.loadNpmTasks('grunt-shell');
+  grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.registerTask('dev', ['debug', 'couchserver']);
 
   grunt.loadTasks('tasks');
 
   // Default task
-  grunt.registerTask('dev', ['clean', 'jshint','less']);
+  grunt.registerTask('dev', ['clean', 'jshint','concat:dist', 'less']);
   grunt.registerTask('default', ['dev', 'couchserver']);
-  //grunt.registerTask('release', ['clean', 'jshint', ]);
+  grunt.registerTask('release', ['clean', 'jshint', 'less', 'concat', 'shell:deployCloudant' ]);
 };
 
 
