@@ -86,14 +86,14 @@ module.exports = function (grunt) {
 
      shell: {
         deployLocal: {
-            command: './node_modules/couchapp/bin.js push couchapp.js ' + process.env.COUCHDB + '/babylist',
+            command: './node_modules/couchapp/bin.js push couchapp.js ' + process.env.COUCHDB + '/d3demo',
             options: {                      // Options
                 stdout: true
             }
         },
 
         deployCloudant: {
-            command: './node_modules/couchapp/bin.js push couchapp.js '+ process.env.CLOUDANT +'/babylist',
+            command: './node_modules/couchapp/bin.js push couchapp.js '+ process.env.CLOUDANT +'/d3demo',
             options: {                      // Options
                 stdout: true
             }
@@ -116,13 +116,32 @@ module.exports = function (grunt) {
           'app/charts.js',
           'app/main.js'
           ],
-        dest: 'dist/app.js',
+        dest: 'dist/js/main.js',
       },
-    }
+    },
+
+    copy: {
+      index: {
+        nonull: true,
+        src: 'index.html',
+        dest: 'dist/index.html',
+      },
+
+      css: {
+        nonull: true,
+        src: [
+          'assets/css/**/*',
+          'assets/fonts/**/*',
+          'assets/img/**/*',
+        ],
+        dest: 'dist/',
+      },
+    },
 
   });
 
   // These plugins provide necessary tasks
+  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
@@ -135,9 +154,9 @@ module.exports = function (grunt) {
   grunt.loadTasks('tasks');
 
   // Default task
-  grunt.registerTask('dev', ['clean', 'jshint','concat:dist', 'less']);
+  grunt.registerTask('dev', ['clean', 'less', 'jshint','concat:dist' ]);
   grunt.registerTask('default', ['dev', 'couchserver']);
-  grunt.registerTask('release', ['clean', 'jshint', 'less', 'concat', 'shell:deployCloudant' ]);
+  grunt.registerTask('release', ['clean', 'jshint', 'less','copy:css', 'concat', 'copy:index', 'shell:deployCloudant' ]);
 };
 
 

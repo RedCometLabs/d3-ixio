@@ -3,7 +3,7 @@ csv = require('csv'),
 nano = require('nano')(process.env['CLOUDANT']),
 _ = require('underscore');
 
-var db = nano.use('ixio-challenge');
+var db = nano.use('d3demo');
 
 
 /*csv()
@@ -119,14 +119,19 @@ csv().from.path(__dirname + '/ixio_jsinsa_data.csv', { delimiter: ';', escape: '
 
   addSizes(item, clusterSize);
 
-  /*db.insert(item, function (err, resp) {
+  db.insert(item, function (err, resp) {
     console.log('db', err, resp);
            
-  });*/
+  });
 
   //console.log(item);
  // console.log(row, i);
 }).on('end', function () { 
   console.log('boom')
   console.log(JSON.stringify(_.values(clusterSize), null, ' '));
+  db.insert(_.values(clusterSize), 'summary', function (err, res) {
+    if (err) { console.log('err summary', err);}
+  });
+
+  
 });
