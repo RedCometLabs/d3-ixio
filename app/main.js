@@ -598,6 +598,8 @@
 
       this.svg = d3.select(this.el)
         .append("svg")
+        .attr('width', this.windowWidth())
+        .attr('height', this.windowHeight())
         .append("g")
         .attr('class', 'svg-chart-area')
         .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
@@ -652,7 +654,9 @@
         .call(groupedBarChart);
 
       this.currentChart = groupedBarChart;
-      this.setText('Hello, this is a long story of text that I am now writing', '#graph5', true);
+      this.setText('To understand the income breakdown in each Cluster Group, ten income categories have been created. ' +
+                   'By clicking on the legend, you can investigate, filter and understand the percentage breakdown of the' +
+                    'Income Categories across the Cluster Groups', '#graph5', true);
     },
 
     showGender: function () {
@@ -695,7 +699,6 @@
       });
 
 
-      console.log(barData);
       d3.select(".svg-chart-area")
         .datum(barData)
         .call(groupedBarChart);
@@ -739,22 +742,24 @@
         };
       });
 
-      console.log(lineData);
       d3.select(".svg-chart-area")
         .datum(lineData)
         .call(lineGraph);
 
       this.currentChart = lineGraph;
-      this.setText('Hello, this is a long story of text that I am now writing','#graph6', true);
+      this.setText('Taking a look at the joining year for each person per Cluster Group, ' +
+                   'we can clearly see when people joined. And when each Cluster Group had its largest growth.'+
+                   '<small>(Click on the legend to filter.)</small>' ,'#graph6', true);
 
     },
 
     showJoinYear2: function () {
-      if (!this.currentChart) { this.showJoinYear2(); }
+      if (!this.currentChart) { this.showJoinYear(); }
 
-      console.log('zom');
       this.currentChart.zoom();
-      this.setText('Hello, this is a long story of text that I am now writing','#graph7', true);
+      this.setText('Zooming in on the busiest period we can again explore and see how '+ 
+                   '<span style="color:rgb(174, 199, 232)">Group 2</span> had a very strong growth up until 2013. '+
+                   'While 2013 was the best year for <span style="color:rgb(44, 160, 44);">Group 6</span>.','#graph7', true);
     },
 
     showProduct: function () {
@@ -785,13 +790,19 @@
         };
       });
 
-      console.log(forceData);
+      _.each(forceData, function (fd) {
+        fd.nodes = _.filter(fd.nodes, function (n) {
+          return n.value > 0;
+        });
+      });
+
       d3.select(".svg-chart-area")
         .datum(forceData)
         .call(forceBubble);
 
       this.currentChart = forceBubble;
-      this.setText('Hello, this is a long story of text that I am now writing','#graph1', true);
+      this.setText('Finally, lets look at product popularity. Viewing the size of the bubbles we can see that Product 1 and Product 3 are the most popular. '+
+      'Click the Group By buttons to analyze the products by Cluster Group or Product.','#graph1', true, true);
 
     },
 
@@ -829,13 +840,16 @@
         .yTitle('Number of people joined')
         .xTitle('Year');
 
-      console.log(radialData);
       d3.select(".svg-chart-area")
         .datum(radialData)
         .call(radialGraph);
 
       this.currentChart = radialGraph;
-      this.setText('There are four cultural profiles and 2 language groups. This radial graph explores spread of the language and culture profiles within the various Cluster Groups. <br/><small>(Hover over a Cluster Group colour on the graph to see its full profile )</small>','#graph4', true);
+      this.setText('There are four cultural profiles and 2 language groups. This radial graph explores spread of the languages ' +
+                    'and culture profiles within the various Cluster Groups. ' +
+                    'What is quite noticeable is English being the dominant language and ' + 
+                    'Cultural Profiles 2 and 3 being the main Cultural Profiles.' +
+                    '<small>(Hover over a Cluster Group colour on the graph to see its full profile )</small>','#graph4', true);
     },
 
     removeCurrentGraph: function () {
@@ -859,14 +873,24 @@
       return this.$el.height();
     },
 
-    setText: function (text, link, fadeIn) {
+    setText: function (text, link, fadeIn, end) {
       var $text = $('#main-text-span'),
       $textArea = $('#main-text'),
-      $link = $('#text-link');
+      $link = $('#text-link'),
+      $image = $('#text-link-image');
+
       var fn = function () {
         $text.html(text);
         $link.prop('href', link);
       };
+
+      if (end) {
+        $image.prop('src', "assets/img/replay.svg");
+        $image.width('40px');
+      } else {
+        $image.prop('src', "assets/img/arrow.svg");
+        $image.width('20px');
+      }
 
       $textArea.show();
 
@@ -895,6 +919,7 @@
     },
 
     displayIntro: function () {
+      $('#main-text').hide();
       $('#intro')
         .width(this.windowWidth())
         .height(this.windowHeight())

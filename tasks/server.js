@@ -48,7 +48,7 @@ module.exports = function (grunt) {
           accept = req.headers.accept.split(','),
           filePath;
 
-      if (!!url.match(/app\.js/)) {
+      if (!!url.match(/main\.js/)) {
         filePath = path.join('./dist',url);
       } else if (!!url.match(/assets/)) {
         // serve any javascript or css files from here assets dir

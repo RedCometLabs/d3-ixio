@@ -5902,11 +5902,12 @@ a span {
   font-size: 11px;
   float: right;
 }
+.legend-linegraph,
 .legend {
   cursor: pointer;
 }
 #bubble-selection {
   float: right;
   top: 7px;
-  right: 20%;
+  right: 10%;
 }

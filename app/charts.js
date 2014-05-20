@@ -439,8 +439,8 @@ charts.GroupedBarChart = function () {
 charts.StackedBar = function () {
   var x0 = d3.scale.ordinal();
   var color = {
-    "Female": "A64260", //d3.scale.category20c();
-    "Male": "225B84"
+    "Female": '#A64260', //d3.scale.category20c();
+    "Male": '#225B84'
   };
 
   function chart(selection) {
@@ -490,7 +490,7 @@ charts.StackedBar = function () {
       //.attr("x", function(d) { return x0(d.x); })
       .attr("y", function(d) { return y(0); })
       .attr("height", function(d) { return height - y(0); })
-      .style("fill", function(d, i) { return color[d.name]; })
+      .style("fill", function(d, i) { console.log('ff', d.name, d, color[d.name]);return color[d.name]; })
       .attr("width", x0.rangeBand())
       .transition()
       .duration(800)
@@ -740,6 +740,11 @@ charts.LineGraph = function () {
       chart.zoom = function () {
         xScale.domain([2007, 2013]);
 
+        d3.selectAll('.line-group')
+          .transition()
+          .duration(500)
+          .style("opacity", 1);
+
         xAxis.ticks(7);
 
         svg.select(".x.axis")
@@ -894,7 +899,6 @@ charts.RadialGraph = function () {
     //Circular segments
     for(j=0; j<cfg.levels-1; j++){
       levelFactor = cfg.factor*radius*((j+1)/cfg.levels);
-      console.log('le', levelFactor, (cfg.w/2-levelFactor));
       g.selectAll(".levels")
         .data(allAxis)
         .enter()
@@ -914,7 +918,6 @@ charts.RadialGraph = function () {
     //Text indicating at what % each level is
     for(j=0; j<cfg.levels; j++){
       levelFactor = cfg.factor*radius*((j+1)/cfg.levels);
-      console.log('le2', levelFactor);
       g.selectAll(".levels")
         .data([1]) //dummy data
         .enter()
@@ -979,18 +982,26 @@ charts.RadialGraph = function () {
       .style("fill", function(j, i){return cfg.color(series);})
       .style("fill-opacity", cfg.opacityArea)
       .on('mouseover', function (d){
-        var z = "polygon."+d3.select(this).attr("class");
-        g.selectAll("polygon")
+        var z = "."+d3.select(this).attr("class");
+        g.selectAll("polygon:not(" + z +"), .radial-circles:not(" + z +")")
         .transition(200)
-        .style("fill-opacity", 0.1); 
+        .style("fill-opacity", 0.1)
+        .style("stroke-opacity", 0.1);
       g.selectAll(z)
         .transition(200)
-        .style("fill-opacity", 0.7);
+        .style("fill-opacity", 0.7)
+        .style("stroke-opacity", 1);
       })
     .on('mouseout', function(){
       g.selectAll("polygon")
       .transition(200)
-      .style("fill-opacity", cfg.opacityArea);
+      .style("fill-opacity", cfg.opacityArea)
+      .style("stroke-opacity", 1);
+
+      g.selectAll(".radial-circles")
+      .transition(200)
+      .style("fill-opacity", 0.9)
+      .style("stroke-opacity", 1);
     })
     .attr('points', function (d) { return cfg.w/2 + "," + cfg.h/2 + ' ' + cfg.w/2 + "," + cfg.h/2 + ' ' + cfg.w/2 + "," + cfg.h/2 + ' ' + cfg.w/2 + "," + cfg.h/2 + ' ' + cfg.w/2 + "," + cfg.h/2 + ' ' + cfg.w/2 + "," + cfg.h/2 + ' ' + cfg.w/2 + "," + cfg.h/2;})
       .transition()
@@ -1011,7 +1022,7 @@ charts.RadialGraph = function () {
       var enteredNode = g.selectAll(".nodes")
       .data(y).enter()
       .append("svg:circle")
-      .attr("class", "radar-chart-serie"+series)
+      .attr("class", "radial-circles radar-chart-serie"+series)
       .attr('cy', cfg.h/2)
       .attr('cx', cfg.w/2)
       .attr('r', cfg.radius)
@@ -1029,13 +1040,18 @@ charts.RadialGraph = function () {
         .transition(200)
         .style('opacity', 1);
 
-      var z = "polygon."+d3.select(this).attr("class");
-      g.selectAll("polygon")
+      var zClass = d3.select(this).attr("class").split(' ')[1];
+
+      var z = '.' +zClass; 
+      g.selectAll("polygon:not(" + z +"), .radial-circles:not(" + z +")")
         .transition(200)
-        .style("fill-opacity", 0.1); 
+        .style("fill-opacity", 0.1) 
+        .style("stroke-opacity", 0.1);
+
       g.selectAll(z)
         .transition(200)
-        .style("fill-opacity", 0.7);
+        .style("fill-opacity", 0.7)
+        .style("stroke-opacity", 1);
       })
     .on('mouseout', function(){
       tooltip
@@ -1043,7 +1059,13 @@ charts.RadialGraph = function () {
       .style('opacity', 0);
     g.selectAll("polygon")
       .transition(200)
-      .style("fill-opacity", cfg.opacityArea);
+      .style("fill-opacity", cfg.opacityArea)
+      .style("stroke-opacity", 1);
+
+    g.selectAll(".radial-circles")
+      .transition(200)
+      .style("fill-opacity", 0.9)
+      .style("stroke-opacity", 1);
     });
 
     enteredNode
@@ -1074,12 +1096,6 @@ charts.RadialGraph = function () {
       .style('font-size', '13px');
 
     chart.createLegend(xColumns, g);
-
-    /*g.attr("transform", "translate(-800, -800)")
-      .transition()
-      .ease("cubic-out")
-      .duration(1000)
-      .attr("transform", "translate(" + cfg.TranslateX + "," + cfg.TranslateY + ")");*/
     });
 
   }
@@ -1097,11 +1113,14 @@ charts.RadialGraph = function () {
 
     //Initiate Legend	
     var legend = svg.append("g")
-      .attr("class", "legend")
+      .attr("class", function (d, i) { return "legend radar-chart-serie" + i;})
       .attr("height", 100)
       .attr("width", 200)
       .attr('transform', 'translate(-150,0)') 
-      ;
+      .on('click', function () {
+        console.log('arguments', arguments);
+
+      });
     //Create colour squares
     legend.selectAll('rect')
       .data(legendOptions)
@@ -1146,12 +1165,6 @@ charts.RadialGraph = function () {
 
 
 charts.ForceBubble = function () {
-  /*<div id="view_selection" class="btn-group">
-        <a href="#" id="all" class="btn active">All Grants</a>
-        <a href="#" id="year" class="btn">Grants By Year</a>
-      </div>
-   */
-
   function chart(selection) {
     var margin = chart.margin(),
         width = chart.width() - margin.left - margin.right,
@@ -1257,6 +1270,7 @@ charts.ForceBubble = function () {
 
     chart.circleNode = circleNode;
     chart.force = force;
+    chart.svg = svg;
 
     var yPos = function (i) {
       var group1 = ["Null","Product3","Product6","Product9"],
@@ -1376,6 +1390,8 @@ charts.ForceBubble = function () {
   chart.remove = function () {
     var force = chart.force,
         circleNode = chart.circleNode;
+
+    chart.svg.selectAll(".legend").remove();
 
     var newTick = function () {
       circleNode
