@@ -226,17 +226,6 @@ charts.GroupedBarChart = function () {
 
   var color = d3.scale.category20c();
 
-  /*var xAxis = d3.svg.axis()
-    .scale(x0)
-    .orient("bottom");
-
-    var yAxis = d3.svg.axis()
-    .scale(y)
-    .orient("left")
-    .tickFormat(d3.format(".2s"));
-    */
-
-
   function chart(selection) {
     var yAxis = chart.yAxis(),
         xAxis = chart.xAxis(),
@@ -487,7 +476,6 @@ charts.StackedBar = function () {
       .data(function (d) { return d.points;})
       .enter()
       .append("rect")
-      //.attr("x", function(d) { return x0(d.x); })
       .attr("y", function(d) { return y(0); })
       .attr("height", function(d) { return height - y(0); })
       .style("fill", function(d, i) { console.log('ff', d.name, d, color[d.name]);return color[d.name]; })
@@ -533,26 +521,6 @@ charts.StackedBar = function () {
 
     svg.select('.y.axis')
       .call(yAxis);
-
-
-    /*var legend = svg.selectAll(".legend")
-      .data(xGroups.reverse())
-      .enter().append("g")
-      .attr("class", "legend")
-      .attr("transform", function(d, i) { return "translate(30," + i * 20 + ")"; });
-
-      legend.append("rect")
-      .attr("x", width - 18)
-      .attr("width", 18)
-      .attr("height", 18)
-      .style("fill", function (d) { return color[d];});
-
-      legend.append("text")
-      .attr("x", width - 28)
-      .attr("y", 9)
-      .attr("dy", ".35em")
-      .style("text-anchor", "end")
-      .text(function(d) { return d; });*/
 
     });
 
@@ -1203,6 +1171,7 @@ charts.ForceBubble = function () {
         var v = node.value;
         return {
           name: node.name,
+          value: v,
           group: d.name,
           radius: Math.sqrt(v) * maxRadius,
           color: color(d.name),
@@ -1214,9 +1183,19 @@ charts.ForceBubble = function () {
 
       nodes = nodes.concat(node);
     });
+    
+    var tip = d3.tip()
+      .attr('class', 'd3-tip')
+      .offset([-10, 0])
+      .html(function(d) {
+        console.log('tt', d);
+        return "<strong  style='color:"+ d.color +"'>Group " + d.group + ": </strong> <span>"+ d.value +"% " + d.name + "</span>";
+      });
 
 
     var svg = d3.select(this);
+
+    svg.call(tip);
 
     var circleNode = svg.selectAll('.circleNodes')
       .data(nodes)
@@ -1237,6 +1216,10 @@ charts.ForceBubble = function () {
       .attr("text-anchor", "middle")
       .style('stroke', '#000')
       .text(function(d) { return d.name.replace('Product', ''); });
+
+   circleNode
+    .on('mouseover', tip.show)
+    .on('mouseout', tip.hide);
 
     function tickGroup(e) {
       

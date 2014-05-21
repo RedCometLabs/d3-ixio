@@ -5772,12 +5772,10 @@ button.close {
     display: none !important;
   }
 }
+h1,
+p,
 svg text,
 body {
-  font-family: 'Ubuntu', sans-serif;
-}
-h1,
-p {
   font-family: 'Ubuntu', sans-serif;
 }
 .col-lg-12 {
@@ -5889,7 +5887,6 @@ a span {
   cursor: pointer;
 }
 #main-text {
-  font-size: 25px;
   display: inline-block;
   position: absolute;
   z-index: 10;
@@ -5899,7 +5896,6 @@ a span {
   color: #333;
 }
 #main-text small {
-  font-size: 11px;
   float: right;
 }
 .legend-linegraph,
