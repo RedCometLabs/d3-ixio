@@ -36,36 +36,40 @@ body {
 <body>
 <!-- Main container. -->
 <div role="main" id="main">
-  <div id="app-container" class="container-fluid">
-    <div class="row"> 
-      <div class="col-lg-12"> 
-        <div id="intro" style="display: none">
-          <div id="intro-text-container">
-            <div id="intro-text">
-              <h1> Exploring Ixio data </h1>
-                <p> Ixio has set a challenge to explore a given set of anonymized demographic data. <br> Click the arrow to begin that exploration.
-                <a id="intro-text-link" href="#graph1"> <span class="glyphicon glyphicon-arrow-right"> </span></a>
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="row-fluid" id="main-text" style="display:none" >
-            <div id="main-text-span" class="col-lg-11">
-            </div>
-            <div class="col-lg-1">
-              <a id="text-link" href="#graph1">  <img id="text-link-image" src="assets/img/arrow.svg" width="20px">  </span></a>
-            </div>
-          </div>
-          <div id="chart-area">
-            <div id="bubble-selection" style="display:none" class="btn-group">
-              <button id="btn-cluster-group" type="button" class="btn active select-btn-group btn-primary">Group by ClusterGroup</button>
-              <button id="btn-product" type="button" class="btn select-btn-group btn-success">Group by Product</button>
-            </div>          
-          </div>
-        </div>
+  <div id="intro" style="display: none">
+    <div id="intro-text-container">
+      <div id="intro-text">
+        <p> Ixio has set a challenge to explore a given set of anonymized demographic data. <br> Lets explore...
+        <a id="intro-text-link" href="#graph1"> <span class="glyphicon glyphicon-arrow-right"> </span></a>
+        </p>
+    <div id="author">
+      <p class="author-text">
+      <img width="100px" src="assets/img/mugshot1.jpg" alt="Garren Smith" class="img-thumbnail"> </img>
+      Created by Garren Smith of <a href="http://www.redcometlabs.com" target="_blank">Red Comet Labs </a> </p>
+    </div>
       </div>
     </div>
+  </div>
+  <div id="app-container" style="display:none" class="container-fluid">
+    <div class="row"> 
+      <div class="col-lg-12"> 
+
+        <div class="row-fluid" id="main-text" style="display:none" >
+          <div id="main-text-span" class="col-lg-11">
+          </div>
+          <div class="col-lg-1">
+            <a id="text-link" href="#graph1">  <img id="text-link-image" src="assets/img/arrow.svg" width="20px">  </span></a>
+        </div>
+      </div>
+      <div id="chart-area">
+        <div id="bubble-selection" style="display:none" class="btn-group">
+          <button id="btn-cluster-group" type="button" class="btn active select-btn-group btn-primary">Group by ClusterGroup</button>
+          <button id="btn-product" type="button" class="btn select-btn-group btn-success">Group by Product</button>
+        </div>          
+      </div>
+    </div>
+  </div>
+</div>
   </div>
 </div>
 

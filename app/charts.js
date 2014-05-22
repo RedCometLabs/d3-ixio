@@ -187,11 +187,10 @@ charts.Line = function () {
     function tick() {
       chart.selection.each(function (data) {
 
-        if (_.isEmpty(chart.realtimeData)) { console.log('done'); return; }
+        if (_.isEmpty(chart.realtimeData)) { return; }
 
         var item = chart.realtimeData.shift();
         data.push(item);
-        console.log(chart.realtimeData.length, item, this);
         var svg = d3.select(this).selectAll('svg').data([data]);
         var path = svg.select('.line');
 
@@ -329,7 +328,7 @@ charts.GroupedBarChart = function () {
       .remove();
 
     var textValues = income.selectAll('text.values')
-      .data(function (d) {console.log('d', d); return d.points;});
+      .data(function (d) {return d.points;});
 
     textValues
       .enter()
@@ -370,7 +369,6 @@ charts.GroupedBarChart = function () {
     var last = null;
     legend.on("click", function (name) {
 
-      console.log(arguments);
       incomeBars
       .transition()
       .duration(1000)
@@ -478,11 +476,11 @@ charts.StackedBar = function () {
       .append("rect")
       .attr("y", function(d) { return y(0); })
       .attr("height", function(d) { return height - y(0); })
-      .style("fill", function(d, i) { console.log('ff', d.name, d, color[d.name]);return color[d.name]; })
+      .style("fill", function(d, i) { return color[d.name]; })
       .attr("width", x0.rangeBand())
       .transition()
       .duration(800)
-      .attr("height", function(d) { console.log('d', d); return y(d.y0) - y(d.y1); })
+      .attr("height", function(d) { return y(d.y0) - y(d.y1); })
       .attr("y", function(d) { return y(d.y1); });
 
     cause.selectAll('text.values')
@@ -498,7 +496,7 @@ charts.StackedBar = function () {
       .attr("y", function (d) {return (y(d.y1) + y(d.y0))/2;})
       .attr("dy", ".35em")
       .style("text-anchor", "middle")
-      .text(function(d) { return "(" + parseInt((d.value / d.size) * 100, 10) + "%)"; });
+      .text(function(d) { return "(" + d3.round((d.value / d.size) * 100, 1) + "%)"; });
 
     cause.selectAll('text.gender')
       .data(function (d) {return d.points;})
@@ -529,7 +527,6 @@ charts.StackedBar = function () {
 
       _.each(selected, function (s) {
 
-        console.log('se', s);
         d3.select('.group-'+s).classed('highlighted', true);
       });
 
@@ -646,7 +643,6 @@ charts.LineGraph = function () {
       });
     });
     // Add a group for each cause.
-    console.log('sd', startData);
     var lineGroup = svg.selectAll(".line-group")
       .data(startData, function (d) { return d.name;});
 
@@ -662,7 +658,7 @@ charts.LineGraph = function () {
       .data(groups.reverse())
       .enter().append("g")
       .attr("class", "legend-linegraph")
-      .attr("transform", function(d, i) { console.log('d', i); return "translate(" + (width - 70 - i * 70)  + "," + -25 + ")"; });
+      .attr("transform", function(d, i) { return "translate(" + (width - 70 - i * 70)  + "," + -25 + ")"; });
 
     legend
       .style("fill-opacity", 1e-6)
@@ -758,7 +754,6 @@ charts.LineGraph = function () {
           .attr("d", line);
 
         if (startData[0].points.length === data[0].points.length) {
-          console.log('done');
           lineGroup.selectAll('.dot')
             .data(function (d) { return _.map(d.points, function (p) { 
               p.name = d.name; 
@@ -1188,7 +1183,6 @@ charts.ForceBubble = function () {
       .attr('class', 'd3-tip')
       .offset([-10, 0])
       .html(function(d) {
-        console.log('tt', d);
         return "<strong  style='color:"+ d.color +"'>Group " + d.group + ": </strong> <span>"+ d.value +"% " + d.name + "</span>";
       });
 
@@ -1269,7 +1263,6 @@ charts.ForceBubble = function () {
         return height - 90;
 
       } else {
-        console.log('un', i);
       }
     };
 
@@ -1325,7 +1318,6 @@ charts.ForceBubble = function () {
     $button
       .show()
       .on('click', function (e) {
-        console.log('clicked');
         $('.select-btn-group').removeClass('active');
         $(e.target).addClass('active');
         var selection = $(e.target).attr('id');

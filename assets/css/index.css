@@ -5857,30 +5857,35 @@ a span {
 }
 #intro {
   background-size: 100%;
-  background: #000000 url(../img/crowd2.jpg) repeat-y center center;
-}
-#intro #intro-text-container {
-  display: inline-block;
-  position: absolute;
-  z-index: 10;
-  width: 100%;
-  height: 100%;
-  top: 0px;
-  left: 0px;
-  padding: 15px;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: #fff;
+  background: #ffffff url(../img/D3Challenge.png) repeat-y center center;
 }
 #intro #intro-text-container #intro-text {
-  width: 80%;
+  -webkit-border-radius: 30px;
+  -moz-border-radius: 30px;
+  border-radius: 30px;
+  width: 50%;
+  padding: 30px;
+  background-color: rgba(255, 255, 255, 0.8);
+  position: absolute;
+  right: 100px;
+  top: 30%;
+  color: #000;
+}
+#intro #intro-text-container #intro-text a span {
+  color: #000;
 }
 #intro #intro-text-container #intro-text h1 {
   font-size: 115px;
 }
 #intro #intro-text-container #intro-text p {
   font-size: 30px;
-  margin-top: 50px;
-  font-family: verdana;
+}
+#author p.author-text {
+  color: #000;
+  font-size: 15px !important;
+}
+#author p.author-text a {
+  color: #82020E;
 }
 #intro-text-link,
 #text-link {

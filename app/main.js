@@ -520,7 +520,6 @@
                         .domain([0, 1900]);
 
       this.fontSize = this.fontScale(this.windowWidth());
-      console.log('ft', this.fontSize);
       $('#main-text-span').css('font-size', this.fontSize);
 
       this.xAxis = d3.svg.axis()
@@ -540,19 +539,19 @@
         .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
 
-      this.svg.append("g")
-        .attr("class", "x axis");
-      //.attr("transform", "translate(0," + this.height() + ")")
-      //.call(this.xAxis);
-
-      this.svg.append("g")
-        .attr("class", "y axis");
-      //.call(this.yAxis);
 
       var div = d3.select("body").append("div")   
         .attr("class", "tooltip")               
         .style("opacity", 0);
 
+    },
+
+    createAxis: function () {
+      this.svg.append("g")
+        .attr("class", "x axis");
+
+      this.svg.append("g")
+        .attr("class", "y axis");
     },
 
     showIncomeClusterGroups: function () {
@@ -584,18 +583,20 @@
         };
       });
 
+      this.createAxis();
+
       d3.select(".svg-chart-area")
         .datum(barData)
         .call(groupedBarChart);
 
       this.currentChart = groupedBarChart;
-      this.setText('To understand the income breakdown in each Cluster Group, ten income categories have been created. ' +
-                   'By clicking on the legend, you can investigate, filter and understand the percentage breakdown of the' +
-                    'Income Categories across the Cluster Groups', '#graph5', true);
+      this.setText('Let’s take a look at the spread of Income Categories in the various Cluster Groups. ' +
+                    'Click on the legend to filter or unfilter the respective Income Categories.', '#graph5', true);
     },
 
     showGender: function () {
       this.removeCurrentGraph();
+      this.createAxis();
       var groupedBarChart = charts.StackedBar()
         .yScale(this.yScale)
         .xScale(this.xScale)
@@ -639,18 +640,19 @@
         .call(groupedBarChart);
 
       this.currentChart = groupedBarChart;
-      this.setText('The data is broken into 6 Cluster Groups. The Cluster Groups vary in size as well as number of <strong style="color:#A64260">Males</strong> to <strong style="color:#225B84">Females</strong>.','#graph2', false);
+      this.setText('The data is broken into 6 Cluster Groups. Below you can compare the sizes of the various Cluster Groups, stacked to show the gender split within each group.','#graph2', false);
     },
 
     showGender2: function () {
       if (!this.currentChart) { this.showGender(); }
 
       this.currentChart.hightLight(["2", "7"]);
-      this.setText('Cluster Groups 2 is the largest Cluster and has the most equal ratio of males to females. Cluster Group 7 is the smallest and has the largest male ratio','#graph3', true);
+      this.setText('Cluster Group 2 is the largest Cluster Group and has the most equal ratio of males to females. Cluster Group 7 is the smallest and has the highest percentage of males.','#graph3', true);
     },
 
     showJoinYear: function () {
       this.removeCurrentGraph();
+      this.createAxis();
 
       var lineGraph = charts.LineGraph()
         .yScale(this.yScale)
@@ -682,9 +684,8 @@
         .call(lineGraph);
 
       this.currentChart = lineGraph;
-      this.setText('Taking a look at the joining year for each person per Cluster Group, ' +
-                   'we can clearly see when people joined. And when each Cluster Group had its largest growth.'+
-                   '<small>(Click on the legend to filter.)</small>' ,'#graph6', true);
+      this.setText('This graph shows how many people joined in each year, with each of the different coloured lines representing a Cluster Group. ' +
+                   '<small>Click on the legend to isolate the respective Cluster Groups.</small>' ,'#graph6', true);
 
     },
 
@@ -692,9 +693,8 @@
       if (!this.currentChart) { this.showJoinYear(); }
 
       this.currentChart.zoom();
-      this.setText('Zooming in on the busiest period we can again explore and see how '+ 
-                   '<span style="color:rgb(174, 199, 232)">Group 2</span> had a very strong growth up until 2013. '+
-                   'While 2013 was the best year for <span style="color:rgb(44, 160, 44);">Group 6</span>.','#graph7', true);
+      this.setText('Zooming in on the period from 2007, it is clear to see that <span style="color:rgb(174, 199, 232)">Cluster Group 2</span> had very strong growth up to 2012, but dropped in 2013; while there was a record number of new sign-ups in 2013 for <span style="color:rgb(44, 160, 44);">Group 6.</span>'+ 
+                   '<small>Click on the legend to isolate the respective Cluster Groups.</small>','#graph7', true);
     },
 
     showProduct: function () {
@@ -736,8 +736,8 @@
         .call(forceBubble);
 
       this.currentChart = forceBubble;
-      this.setText('Finally, lets look at product popularity. Viewing the size of the bubbles we can see that Product 1 and Product 3 are the most popular. '+
-      'Click the Group By buttons to analyze the products by Cluster Group or Product.','#graph1', true, true);
+      this.setText('Finally, let’s look at product popularity. Judging by the size of the bubbles, it’s clear that Product 1 and Product 3 are the most popular. '+
+      'Click the “Group By” buttons to analyse the data by Cluster Group or Product.','#graph1', true, true);
 
     },
 
@@ -780,11 +780,9 @@
         .call(radialGraph);
 
       this.currentChart = radialGraph;
-      this.setText('There are four cultural profiles and 2 language groups. This radial graph explores spread of the languages ' +
-                    'and culture profiles within the various Cluster Groups. ' +
-                    'What is quite noticeable is English being the dominant language and ' + 
-                    'Cultural Profiles 2 and 3 being the main Cultural Profiles.' +
-                    '<small>(Hover over a Cluster Group colour on the graph to see its full profile )</small>','#graph4', true);
+      this.setText('This radial graph explores the spread of the Languages and Cultural Profiles within the various Cluster Groups.' +
+                    ' Notice that English is the dominant language across all the Cluster Groups, except Cluster Group 1, which is 100% Afrikaans. Cultural Profiles 2 and 3 dominate the sample group.' +
+                    '<small>(Explore further… Hover over a Cluster Group colour on the graph to isolate its profile.)</small>','#graph4', true);
     },
 
     removeCurrentGraph: function () {
@@ -854,6 +852,12 @@
     },
 
     displayIntro: function () {
+      d3.select('#intro-text')
+      .style('opacity', 0)
+      .transition()
+      .duration(3000)
+      .style('opacity', 1);
+
       $('#main-text').hide();
       $('#intro')
         .width(this.windowWidth())
@@ -863,6 +867,8 @@
 
     hideIntro: function () {
       $('#intro').hide();
+      $('#app-container').show();
+      $("#bubble-selection").hide();
     }
 
   };
@@ -888,26 +894,32 @@
       },
 
       hightLightGender: function () {
+        app.hideIntro();
         app.showGender2();
       },
 
       showRadial: function() {
+        app.hideIntro();
         app.showRadialInfo();
       },
 
       showIncome: function() {
+        app.hideIntro();
         app.showIncomeClusterGroups();
       },
 
       showJoinYear: function() {
+        app.hideIntro();
         app.showJoinYear();
       },
 
       showJoinYear2: function() {
+        app.hideIntro();
         app.showJoinYear2();
       },
 
       showProduct: function() {
+        app.hideIntro();
         app.showProduct();
       },
 

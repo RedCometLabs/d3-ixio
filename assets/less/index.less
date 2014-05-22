@@ -104,22 +104,26 @@ a span {
 
 #intro {
   background-size: 100%;
-  background: #000 url(../img/crowd2.jpg) repeat-y center center;
+  background: #fff url(../img/D3Challenge.png) repeat-y center center;
 
   #intro-text-container {
-    display: inline-block;
-    position: absolute;
-    z-index: 10;
-    width: 100%;
-    height: 100%;
-    top: 0px;
-    left: 0px;
-    padding: 15px;
-    background-color: rgba(0,0,0, 0.5);
-    color: #fff;
 
     #intro-text {
-      width: 80%;
+      -webkit-border-radius: 30px;
+      -moz-border-radius: 30px;
+      border-radius: 30px;
+      width: 50%;
+      //color: #ff7f0e;
+      padding: 30px;
+      background-color: rgba(255,255,255,0.8);
+      position: absolute;
+      right: 100px;
+      top: 30%;
+
+      color: #000;
+      a span {
+        color: #000;
+      }
 
       h1 {
         font-size: 115px;
@@ -127,14 +131,28 @@ a span {
 
       p {
         font-size: 30px;
-        margin-top: 50px;
-        font-family: verdana;
       }
     }
 
   }
+
+
 }
 
+#author {
+  //position:absolute;
+  //bottom: 15px;
+  //right: 10px;
+   p.author-text {
+    color: #000;
+    font-size: 15px !important;
+
+    a {
+      color: #82020E;
+
+    }
+  }
+}
 #intro-text-link, #text-link {
   cursor: pointer;
 }
